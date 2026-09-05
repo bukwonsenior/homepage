@@ -11,7 +11,7 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{background:transparent;}
   body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
-  .card{background:transparent;border:none;border-radius:0;padding:4px 2px;}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px;}
   .eyeline{font-size:11px;letter-spacing:.2em;font-weight:800;color:var(--brand);display:flex;align-items:center;gap:9px;margin-bottom:13px;}
   .eyeline::after{content:"";flex:1;height:1px;background:var(--line);}
   .date{font-size:15px;color:var(--gray);font-weight:600;}
@@ -44,7 +44,7 @@
   function render(items){
     var meal=document.getElementById('meal');
     if(items && items.length){
-      // 밥/국/반차을 두 줄로: 앞 절반, 뒤 절반
+      // 밥/국/반찬을 두 줄로: 앞 절반, 뒤 절반
       var half=Math.ceil(items.length/2);
       meal.innerHTML = items.slice(0,half).join(' · ') + '<br>' + items.slice(half).join(' · ');
     }else{
@@ -73,3 +73,4 @@
 </script>
 </body>
 </html>
+
