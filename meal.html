@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오늘의 식단 · 북원노인종합복지관</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<style>
+  :root{--brand:#F38100;--action:#8A4200;--ink:#2B2320;--gray:#595757;--line:#E4DCD2;--cream2:#F1EAE0;--white:#fff;--r:18px;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{background:transparent;}
+  body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px;}
+  .eyeline{font-size:11px;letter-spacing:.2em;font-weight:800;color:var(--brand);display:flex;align-items:center;gap:9px;margin-bottom:13px;}
+  .eyeline::after{content:"";flex:1;height:1px;background:var(--line);}
+  .date{font-size:15px;color:var(--gray);font-weight:600;}
+  .meal{font-size:21px;font-weight:800;line-height:1.5;letter-spacing:-.6px;margin-top:8px;}
+  .none{font-size:18px;font-weight:700;color:var(--gray);line-height:1.6;margin-top:8px;}
+  .link{margin-top:16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--cream2);padding-top:14px;font-size:17px;font-weight:800;color:var(--action);text-decoration:none;min-height:44px;}
+  .link svg{width:17px;height:17px;stroke:var(--action);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  a{color:var(--action);text-decoration:none;}
+</style>
+</head>
+<body>
+<section class="card">
+  <div class="eyeline">TODAY · 오늘의 식단</div>
+  <div class="date" id="date">불러오는 중…</div>
+  <div class="meal" id="meal"></div>
+  <a class="link" id="more" href="https://www.bwsenior.or.kr/main/sub.html?pageCode=13" target="_top">
+    <span>이번 달 식단표 보기</span>
+    <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+  </a>
+</section>
+
+<script>
+(function(){
+  var DOW=['일','월','화','수','목','금','토'];
+  var now=new Date();
+  var y=now.getFullYear(), m=now.getMonth()+1, d=now.getDate();
+  var key=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+  document.getElementById('date').textContent = m+'월 '+d+'일 '+DOW[now.getDay()]+'요일';
+
+  function render(items){
+    var meal=document.getElementById('meal');
+    if(items && items.length){
+      // 밥/국/반찬을 두 줄로: 앞 절반, 뒤 절반
+      var half=Math.ceil(items.length/2);
+      meal.innerHTML = items.slice(0,half).join(' · ') + '<br>' + items.slice(half).join(' · ');
+    }else{
+      meal.className='none';
+      meal.textContent = (now.getDay()===0||now.getDay()===6)
+        ? '주말·공휴일은 식당을 운영하지 않습니다.'
+        : '오늘 등록된 식단이 없습니다.';
+    }
+    sendHeight();
+  }
+
+  fetch('menu.json?t='+Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(j){ render((j.days||{})[key]); })
+    .catch(function(){ render(null); });
+
+  function sendHeight(){
+    var h=Math.ceil(document.querySelector('.card').getBoundingClientRect().height);
+    try{ parent.postMessage({bwMeal:'height',height:h},'*'); }catch(e){}
+  }
+  window.addEventListener('load',sendHeight);
+  window.addEventListener('resize',sendHeight);
+  if(window.ResizeObserver) new ResizeObserver(sendHeight).observe(document.body);
+  setTimeout(sendHeight,500); setTimeout(sendHeight,1500);
+})();
+</script>
+</body>
+</html>
