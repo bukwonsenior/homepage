@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>이달의 행사 · 북원노인종합복지관</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<style>
+  :root{--brand:#F38100;--action:#8A4200;--ink:#2B2320;--gray:#595757;--line:#E4DCD2;--cream2:#F1EAE0;--white:#fff;--r:18px;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{background:transparent;}
+  body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px;}
+  .eyeline{font-size:11px;letter-spacing:.2em;font-weight:800;color:var(--brand);display:flex;align-items:center;gap:9px;margin-bottom:15px;}
+  .eyeline::after{content:"";flex:1;height:1px;background:var(--line);}
+  .list{display:flex;flex-direction:column;gap:13px;}
+  .ev{display:flex;align-items:center;gap:14px;}
+  .badge{flex:none;width:52px;height:52px;border-radius:13px;background:var(--brand);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;}
+  .badge .m{font-size:12px;font-weight:700;opacity:.92;margin-bottom:2px;}
+  .badge .d{font-size:23px;font-weight:800;}
+  .evtitle{font-size:18px;font-weight:700;line-height:1.35;letter-spacing:-.3px;}
+  .none{font-size:18px;font-weight:700;color:var(--gray);line-height:1.6;padding:6px 0;}
+  .link{margin-top:16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--cream2);padding-top:14px;font-size:17px;font-weight:800;color:var(--action);text-decoration:none;min-height:44px;}
+  .link svg{width:17px;height:17px;stroke:var(--action);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  a{color:var(--action);text-decoration:none;}
+</style>
+</head>
+<body>
+<section class="card">
+  <div class="eyeline">THIS MONTH · 이달의 행사</div>
+  <div class="list" id="list"></div>
+  <a class="link" id="more" href="https://www.bwsenior.or.kr/main/sub.html?pageCode=12" target="_top">
+    <span>전체 일정 보기</span>
+    <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+  </a>
+</section>
+
+<script>
+(function(){
+  var MAX = 3;              // 카드에 보여줄 다가오는 행사 개수
+  var now = new Date();
+  var todayKey = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+
+  function render(days){
+    var list = document.getElementById('list');
+    var items = [];
+    Object.keys(days||{}).sort().forEach(function(k){
+      (days[k]||[]).forEach(function(title){ items.push({date:k, title:title}); });
+    });
+    // 오늘 이후(오늘 포함)만
+    var upcoming = items.filter(function(x){ return x.date >= todayKey; }).slice(0, MAX);
+
+    if(upcoming.length){
+      list.innerHTML = upcoming.map(function(x){
+        var mm = x.date.slice(5,7), dd = x.date.slice(8,10);
+        return '<div class="ev">'
+             +   '<div class="badge"><span class="m">'+mm+'월</span><span class="d">'+dd+'</span></div>'
+             +   '<div class="evtitle">'+esc(x.title)+'</div>'
+             + '</div>';
+      }).join('');
+    } else {
+      list.innerHTML = '<div class="none">이달 예정된 행사가 없습니다.</div>';
+    }
+    sendHeight();
+  }
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  fetch('events.json?t='+Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(j){ render((j&&j.days)||{}); })
+    .catch(function(){ render({}); });
+
+  function sendHeight(){
+    var h = Math.ceil(document.querySelector('.card').getBoundingClientRect().height);
+    try{ parent.postMessage({bwEvents:'height', height:h}, '*'); }catch(e){}
+  }
+  window.addEventListener('load', sendHeight);
+  window.addEventListener('resize', sendHeight);
+  if(window.ResizeObserver) new ResizeObserver(sendHeight).observe(document.body);
+  setTimeout(sendHeight,500); setTimeout(sendHeight,1500);
+})();
+</script>
+</body>
+</html>
