@@ -41,6 +41,11 @@
   .pfee{flex:none;font-size:14px;font-weight:800;color:var(--accent);background:var(--accent-soft);padding:5px 11px;border-radius:12px;}
   .pfee.paid{color:var(--action);background:var(--soft);}
   .empty{text-align:center;color:var(--gray);font-size:16px;padding:36px 0;}
+  .pager{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;}
+  .pager button{min-width:104px;height:54px;border:1.5px solid var(--line);background:var(--white);color:var(--action);font-size:18px;font-weight:800;border-radius:14px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow);display:flex;align-items:center;justify-content:center;gap:7px;}
+  .pager button:disabled{opacity:.32;cursor:default;box-shadow:none;}
+  .pager button svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;}
+  .pager .pg{font-size:17px;font-weight:800;color:var(--gray);min-width:58px;text-align:center;}
 
   /* ===== 상세 ===== */
   .top{display:flex;align-items:center;gap:12px;margin-bottom:14px;}
@@ -80,6 +85,7 @@
     <div class="apply" id="applyBox"></div>
     <div class="tabs" id="tabs"></div>
     <div class="plist" id="plist"></div>
+    <div class="pager" id="pager"></div>
   </div>
   <!-- 상세 -->
   <div id="detailView" class="hidden"></div>
@@ -87,7 +93,7 @@
 
 <script>
 (function(){
-  var DATA=null, curCat=null, ICON='<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4"/></svg>';
+  var DATA=null, curCat=null, curPage=1, PAGE=10, ICON='<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4M9 15l2 2 4-4"/></svg>';
   var CATS=['평생교육','동아리','특강'];
 
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
@@ -124,9 +130,12 @@
       var da=(a.요일&&a.요일[0]?order[a.요일[0]]:9)-(b.요일&&b.요일[0]?order[b.요일[0]]:9);
       if(da) return da; return (a.시작시간||'').localeCompare(b.시작시간||'');
     });
-    var el=document.getElementById('plist');
-    if(!items.length){ el.innerHTML='<div class="empty">등록된 프로그램이 없습니다.</div>'; sendHeight(); return; }
-    el.innerHTML=items.map(function(p){
+    var el=document.getElementById('plist'), pg=document.getElementById('pager');
+    if(!items.length){ el.innerHTML='<div class="empty">등록된 프로그램이 없습니다.</div>'; pg.innerHTML=''; sendHeight(); return; }
+    var totalPages=Math.ceil(items.length/PAGE);
+    if(curPage>totalPages) curPage=totalPages;
+    var pageItems=items.slice((curPage-1)*PAGE, curPage*PAGE);
+    el.innerHTML=pageItems.map(function(p){
       var paid=(p.수강료||0)>0;
       var thumb=p.사진?' style="background-image:url('+esc(p.사진)+')"':'';
       return '<div class="pcard" data-id="'+esc(p.id)+'">'
@@ -137,6 +146,15 @@
         + '</div>';
     }).join('');
     el.querySelectorAll('.pcard').forEach(function(c){ c.addEventListener('click',function(){location.hash='p/'+c.dataset.id;}); });
+    // 페이지 넘김 버튼 (2쪽 이상일 때만)
+    if(totalPages>1){
+      pg.innerHTML='<button id="pgPrev"'+(curPage<=1?' disabled':'')+'><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>이전</button>'
+        + '<span class="pg">'+curPage+' / '+totalPages+'</span>'
+        + '<button id="pgNext"'+(curPage>=totalPages?' disabled':'')+'>다음<svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>';
+      var pv=document.getElementById('pgPrev'), nx=document.getElementById('pgNext');
+      if(pv) pv.addEventListener('click',function(){ if(curPage>1){curPage--; renderList(); window.scrollTo(0,0);} });
+      if(nx) nx.addEventListener('click',function(){ if(curPage<totalPages){curPage++; renderList(); window.scrollTo(0,0);} });
+    } else { pg.innerHTML=''; }
     sendHeight();
   }
 
@@ -192,7 +210,7 @@
     DATA=j; curCat=CATS[0];
     renderApply(); renderTabs(); renderList(); route();
     document.getElementById('tabs').addEventListener('click',function(e){
-      var b=e.target.closest('.tab'); if(!b)return; curCat=b.dataset.c; renderTabs(); renderList();
+      var b=e.target.closest('.tab'); if(!b)return; curCat=b.dataset.c; curPage=1; renderTabs(); renderList();
     });
   }).catch(function(){ document.getElementById('plist').innerHTML='<div class="empty">프로그램 정보를 불러오지 못했습니다.</div>'; });
 
