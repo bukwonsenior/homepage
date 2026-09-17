@@ -35,38 +35,51 @@ def parse(html):
     soup = BeautifulSoup(html, "html.parser")
     today = datetime.now(KST).date()
     days = {}
+    bongsa = {}   # 날짜별 오늘의 봉사단
 
     for wl in soup.select("div.weekLine"):
-        # 날짜: boxTop 안의 p 중 'MM.DD' 형식만
-        dates = []
-        for p in wl.select("div.boxTop p"):
-            t = p.get_text(strip=True)
-            m = re.match(r"(\d{2})\.(\d{2})", t)
-            dates.append((int(m.group(1)), int(m.group(2))) if m else None)
-        dates = [d for d in dates if d]
+        # boxTop 열 순서를 그대로(빈칸 포함) 읽어 열 번호를 맞춘다
+        tops = [p.get_text(strip=True) for p in wl.select("div.boxTop p")]
 
-        # 메뉴: 중식 boxMenu (첫 번째). 라벨/빈칸 제외한 셀들
         boxmenus = wl.select("div.boxMenu")
         if not boxmenus:
             continue
-        bm = boxmenus[0]
-        cells = []
-        for c in bm.find_all(recursive=False):
-            txt = c.get_text("\n", strip=True)
-            if txt and txt not in ("중식", "석식"):
-                cells.append(txt)
+        lunch = boxmenus[0]          # 중식(첫 번째 boxMenu)
+        vol = None                   # 봉사단('봉사단' 라벨로 시작하는 boxMenu)
+        for bm in boxmenus:
+            kids = bm.find_all(recursive=False)
+            if kids and kids[0].get_text(strip=True) == "봉사단":
+                vol = bm
+                break
+        lunch_cells = lunch.find_all(recursive=False)
+        vol_cells = vol.find_all(recursive=False) if vol else []
 
-        for (mm, dd), cell in zip(dates, cells):
+        for j, t in enumerate(tops):
+            m = re.match(r"(\d{2})\.(\d{2})", t)
+            if not m:
+                continue
+            mm, dd = int(m.group(1)), int(m.group(2))
             year = today.year
             if mm == 1 and today.month == 12:
                 year += 1
             elif mm == 12 and today.month == 1:
                 year -= 1
-            items = [x.strip() for x in cell.split("\n") if x.strip()]
-            if items:
-                days[date(year, mm, dd).isoformat()] = items
+            iso = date(year, mm, dd).isoformat()
 
-    return days
+            # 중식(같은 열 번호)
+            if j < len(lunch_cells):
+                cell = lunch_cells[j].get_text("\n", strip=True)
+                items = [x.strip() for x in cell.split("\n") if x.strip() and x.strip() not in ("중식", "석식")]
+                if items:
+                    days[iso] = items
+
+            # 봉사단(같은 열 번호)
+            if j < len(vol_cells):
+                name = vol_cells[j].get_text(" ", strip=True)
+                if name and name != "봉사단":
+                    bongsa[iso] = name
+
+    return days, bongsa
 
 def main():
     try:
@@ -75,7 +88,7 @@ def main():
         print(f"::error::식단 페이지를 불러오지 못했습니다: {e}")
         sys.exit(1)
 
-    days = parse(html)
+    days, bongsa = parse(html)
     if not days:
         print("::error::식단을 한 건도 읽지 못했습니다. 페이지 구조가 바뀌었을 수 있습니다. (기존 menu.json 유지)")
         sys.exit(1)
@@ -85,10 +98,11 @@ def main():
         "출처": URL,
         "식단표주소": URL,
         "days": dict(sorted(days.items())),
+        "bongsa": dict(sorted(bongsa.items())),
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
-    print(f"✓ {OUT} 생성 — {len(days)}일치 식단 ({min(days)} ~ {max(days)})")
+    print(f"✓ {OUT} 생성 — 식단 {len(days)}일 / 봉사단 {len(bongsa)}일 ({min(days)} ~ {max(days)})")
 
 if __name__ == "__main__":
     main()
