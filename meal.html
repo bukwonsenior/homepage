@@ -20,6 +20,9 @@
   .link{margin-top:16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--cream2);padding-top:14px;font-size:17px;font-weight:800;color:var(--action);text-decoration:none;min-height:44px;}
   .link svg{width:17px;height:17px;stroke:var(--action);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
   a{color:var(--action);text-decoration:none;}
+  .vol{margin-top:13px;padding-top:13px;border-top:1px solid var(--cream2);display:flex;align-items:center;gap:10px;}
+  .vol .vlabel{flex:none;font-size:12px;font-weight:800;letter-spacing:.02em;color:#fff;background:var(--brand);padding:5px 11px;border-radius:20px;}
+  .vol .vname{font-size:17px;font-weight:800;letter-spacing:-.3px;color:var(--ink);}
 </style>
 </head>
 <body>
@@ -27,6 +30,10 @@
   <div class="eyeline">TODAY · 오늘의 식단</div>
   <div class="date" id="date">불러오는 중…</div>
   <div class="meal" id="meal"></div>
+  <div class="vol" id="vol" style="display:none">
+    <span class="vlabel">오늘의 봉사단</span>
+    <span class="vname" id="vname"></span>
+  </div>
   <a class="link" id="more" href="https://www.bwsenior.or.kr/main/sub.html?pageCode=13" target="_top">
     <span>이번 달 식단표 보기</span>
     <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
@@ -56,9 +63,17 @@
     sendHeight();
   }
 
+  function renderVol(name){
+    if(name){
+      document.getElementById('vname').textContent = name;
+      document.getElementById('vol').style.display = 'flex';
+    }
+    sendHeight();
+  }
+
   fetch('menu.json?t='+Date.now())
     .then(function(r){ return r.json(); })
-    .then(function(j){ render((j.days||{})[key]); })
+    .then(function(j){ render((j.days||{})[key]); renderVol((j.bongsa||{})[key]); })
     .catch(function(){ render(null); });
 
   function sendHeight(){
@@ -73,4 +88,3 @@
 </script>
 </body>
 </html>
-

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>공지사항 · 북원노인종합복지관</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<style>
+  :root{--brand:#F38100;--action:#8A4200;--ink:#2B2320;--gray:#595757;--line:#E4DCD2;--cream2:#F1EAE0;--soft:#FDF0E2;--white:#fff;--r:18px;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{background:transparent;}
+  body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px;}
+  .eyeline{font-size:11px;letter-spacing:.2em;font-weight:800;color:var(--brand);display:flex;align-items:center;gap:9px;margin-bottom:15px;}
+  .eyeline::after{content:"";flex:1;height:1px;background:var(--line);}
+  .list{display:flex;flex-direction:column;}
+  .no{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--cream2);}
+  .no:first-child{padding-top:2px;}
+  .badge{flex:none;width:52px;height:52px;border-radius:13px;background:var(--brand);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;}
+  .badge .m{font-size:12px;font-weight:700;opacity:.92;margin-bottom:2px;}
+  .badge .d{font-size:23px;font-weight:800;}
+  .txt{flex:1;min-width:0;}
+  .cate{display:inline-block;font-size:12px;font-weight:800;color:var(--action);background:var(--soft);padding:3px 9px;border-radius:11px;margin-bottom:5px;}
+  .title{font-size:17px;font-weight:700;line-height:1.4;letter-spacing:-.3px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+  .none{font-size:18px;font-weight:700;color:var(--gray);line-height:1.6;padding:6px 0;}
+  .link{margin-top:16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--cream2);padding-top:14px;font-size:17px;font-weight:800;color:var(--action);text-decoration:none;min-height:44px;}
+  .link svg{width:17px;height:17px;stroke:var(--action);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  a{color:inherit;text-decoration:none;}
+</style>
+</head>
+<body>
+<section class="card">
+  <div class="eyeline">NOTICE · 공지사항</div>
+  <div class="list" id="list"></div>
+  <a class="link" id="more" href="https://www.bwsenior.or.kr/main/sub.html?pageCode=40" target="_top">
+    <span>공지사항 전체 보기</span>
+    <svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg>
+  </a>
+</section>
+
+<script>
+(function(){
+  var MAX = 4;   // 카드에 보여줄 공지 수
+
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  function render(items){
+    var list = document.getElementById('list');
+    items = (items||[]).slice(0, MAX);
+    if(!items.length){ list.innerHTML='<div class="none">등록된 공지사항이 없습니다.</div>'; sendHeight(); return; }
+    list.innerHTML = items.map(function(x){
+      var mm = x.날짜 ? x.날짜.slice(5,7) : '';
+      var dd = x.날짜 ? x.날짜.slice(8,10) : '';
+      var badge = x.날짜
+        ? '<div class="badge"><span class="m">'+mm+'월</span><span class="d">'+dd+'</span></div>'
+        : '<div class="badge"><span class="d">공지</span></div>';
+      var cate = x.구분 ? '<span class="cate">'+esc(x.구분)+'</span>' : '';
+      var inner = badge + '<div class="txt">'+cate+'<div class="title">'+esc(x.제목)+'</div></div>';
+      return x.url
+        ? '<a class="no" href="'+esc(x.url)+'" target="_top">'+inner+'</a>'
+        : '<div class="no">'+inner+'</div>';
+    }).join('');
+    sendHeight();
+  }
+
+  fetch('notice.json?t='+Date.now())
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(j && j.전체보기) document.getElementById('more').setAttribute('href', j.전체보기);
+      render((j&&j.items)||[]);
+    })
+    .catch(function(){ render([]); });
+
+  function sendHeight(){
+    var h = Math.ceil(document.querySelector('.card').getBoundingClientRect().height);
+    try{ parent.postMessage({bwNotice:'height', height:h}, '*'); }catch(e){}
+  }
+  window.addEventListener('load', sendHeight);
+  window.addEventListener('resize', sendHeight);
+  if(window.ResizeObserver) new ResizeObserver(sendHeight).observe(document.body);
+  setTimeout(sendHeight,500); setTimeout(sendHeight,1500);
+})();
+</script>
+</body>
+</html>
