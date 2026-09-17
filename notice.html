@@ -11,8 +11,14 @@
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{background:transparent;}
   body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
-  .card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-height: 350px;}
-  .eyeline{font-size:11px;letter-spacing:.2em;font-weight:800;color:var(--brand);display:flex;align-items:center;gap:9px;margin-bottom:15px;}
+  /* ===== 공통 카드 규격 (3개 창 동일) ===== */
+  .card{display:flex;flex-direction:column;min-width:0;min-height:340px;background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;}
+  .eyeline{font-size:15px;letter-spacing:.12em;font-weight:800;color:var(--brand);display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+  .eyeline::after{content:"";flex:1;height:1px;background:var(--line);}
+  .link{margin-top:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;border-top:1px solid var(--cream2);padding-top:14px;font-size:16px;font-weight:800;color:var(--action);min-height:44px;}
+  .link svg{width:16px;height:16px;stroke:var(--action);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  a{color:inherit;text-decoration:none;}
+  /* ===== 콘텐츠 ===== */
   .list{display:flex;flex-direction:column;}
   .no{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--cream2);}
   .no:first-child{padding-top:2px;}
@@ -21,11 +27,14 @@
   .badge .d{font-size:23px;font-weight:800;}
   .txt{flex:1;min-width:0;}
   .cate{display:inline-block;font-size:12px;font-weight:800;color:var(--action);background:var(--soft);padding:3px 9px;border-radius:11px;margin-bottom:5px;}
-  .title{font-size:17px;font-weight:700;line-height:1.4;letter-spacing:-.3px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;}
-  .none{font-size:18px;font-weight:700;color:var(--gray);line-height:1.6;padding:6px 0;}
-  .link{margin-top:16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--cream2);padding-top:14px;font-size:17px;font-weight:800;color:var(--action);text-decoration:none;min-height:44px;}
-  .link svg{width:17px;height:17px;stroke:var(--action);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
-  a{color:inherit;text-decoration:none;}
+  .title{font-size:17px;font-weight:700;line-height:1.4;letter-spacing:-.3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .none{font-size:17px;font-weight:700;color:var(--gray);line-height:1.6;padding:6px 0;}
+  /* ===== PC(넓을 때) 크게 ===== */
+  @media (min-width:480px){
+    .eyeline{font-size:20px;letter-spacing:.08em;}
+    .link{font-size:17px;}
+    .title{font-size:18px;}
+  }
 </style>
 </head>
 <body>
@@ -40,43 +49,27 @@
 
 <script>
 (function(){
-  var MAX = 3;   // 카드에 보여줄 공지 수
-
+  var MAX = 3;
   function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
-
   function render(items){
     var list = document.getElementById('list');
     items = (items||[]).slice(0, MAX);
     if(!items.length){ list.innerHTML='<div class="none">등록된 공지사항이 없습니다.</div>'; sendHeight(); return; }
     list.innerHTML = items.map(function(x){
-      var mm = x.날짜 ? x.날짜.slice(5,7) : '';
-      var dd = x.날짜 ? x.날짜.slice(8,10) : '';
-      var badge = x.날짜
-        ? '<div class="badge"><span class="m">'+mm+'월</span><span class="d">'+dd+'</span></div>'
-        : '<div class="badge"><span class="d">공지</span></div>';
-      var cate = x.구분 ? '<span class="cate">'+esc(x.구분)+'</span>' : '';
-      var inner = badge + '<div class="txt">'+cate+'<div class="title">'+esc(x.제목)+'</div></div>';
-      return x.url
-        ? '<a class="no" href="'+esc(x.url)+'" target="_top">'+inner+'</a>'
-        : '<div class="no">'+inner+'</div>';
+      var mm=x.날짜?x.날짜.slice(5,7):'', dd=x.날짜?x.날짜.slice(8,10):'';
+      var badge=x.날짜?'<div class="badge"><span class="m">'+mm+'월</span><span class="d">'+dd+'</span></div>':'<div class="badge"><span class="d">공지</span></div>';
+      var cate=x.구분?'<span class="cate">'+esc(x.구분)+'</span>':'';
+      var inner=badge+'<div class="txt">'+cate+'<div class="title">'+esc(x.제목)+'</div></div>';
+      return x.url?'<a class="no" href="'+esc(x.url)+'" target="_top">'+inner+'</a>':'<div class="no">'+inner+'</div>';
     }).join('');
     sendHeight();
   }
-
-  fetch('notice.json?t='+Date.now())
-    .then(function(r){ return r.json(); })
-    .then(function(j){
-      if(j && j.전체보기) document.getElementById('more').setAttribute('href', j.전체보기);
-      render((j&&j.items)||[]);
-    })
-    .catch(function(){ render([]); });
-
-  function sendHeight(){
-    var h = Math.ceil(document.querySelector('.card').getBoundingClientRect().height);
-    try{ parent.postMessage({bwNotice:'height', height:h}, '*'); }catch(e){}
-  }
-  window.addEventListener('load', sendHeight);
-  window.addEventListener('resize', sendHeight);
+  fetch('notice.json?t='+Date.now()).then(function(r){return r.json();}).then(function(j){
+    if(j&&j.전체보기) document.getElementById('more').setAttribute('href', j.전체보기);
+    render((j&&j.items)||[]);
+  }).catch(function(){ render([]); });
+  function sendHeight(){ var h=Math.ceil(document.querySelector('.card').getBoundingClientRect().height); try{ parent.postMessage({bwNotice:'height',height:h},'*'); }catch(e){} }
+  window.addEventListener('load',sendHeight); window.addEventListener('resize',sendHeight);
   if(window.ResizeObserver) new ResizeObserver(sendHeight).observe(document.body);
   setTimeout(sendHeight,500); setTimeout(sendHeight,1500);
 })();

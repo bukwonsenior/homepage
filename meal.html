@@ -7,22 +7,32 @@
 <meta name="robots" content="noindex">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
 <style>
-  :root{--brand:#F38100;--action:#8A4200;--ink:#2B2320;--gray:#595757;--line:#E4DCD2;--cream2:#F1EAE0;--white:#fff;--r:18px;}
+  :root{--brand:#F38100;--action:#8A4200;--ink:#2B2320;--gray:#595757;--line:#E4DCD2;--cream2:#F1EAE0;--soft:#FDF0E2;--white:#fff;--r:18px;}
   *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
   html,body{background:transparent;}
   body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
-  .card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-height: 350px;}
-  .eyeline{font-size:11px;letter-spacing:.2em;font-weight:800;color:var(--brand);display:flex;align-items:center;gap:12px;margin-bottom:13px;}
+  /* ===== 공통 카드 규격 (3개 창 동일) ===== */
+  .card{display:flex;flex-direction:column;min-width:0;min-height:340px;background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px;}
+  .eyeline{font-size:15px;letter-spacing:.12em;font-weight:800;color:var(--brand);display:flex;align-items:center;gap:10px;margin-bottom:16px;}
   .eyeline::after{content:"";flex:1;height:1px;background:var(--line);}
-  .date{font-size:15px;color:var(--gray);font-weight:600;}
-  .meal{font-size:21px;font-weight:800;line-height:1.5;letter-spacing:-.10px;margin-top:10px;}
-  .none{font-size:18px;font-weight:700;color:var(--gray);line-height:1.6;margin-top:8px;}
-  .link{margin-top:16px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid var(--cream2);padding-top:14px;font-size:17px;font-weight:800;color:var(--action);text-decoration:none;min-height:44px;}
-  .link svg{width:17px;height:17px;stroke:var(--action);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
-  a{color:var(--action);text-decoration:none;}
-  .vol{margin-top:13px;padding-top:13px;border-top:1px solid var(--cream2);display:flex;align-items:center;gap:10px;}
-  .vol .vlabel{flex:none;font-size:15px;font-weight:800;letter-spacing:.02em;color:#fff;background:var(--brand);padding:5px 11px;border-radius:20px;}
-  .vol .vname{font-size:17px;font-weight:800;letter-spacing:-.3px;color:var(--ink);}
+  .link{margin-top:auto;display:flex;align-items:center;justify-content:flex-end;gap:8px;border-top:1px solid var(--cream2);padding-top:14px;font-size:16px;font-weight:800;color:var(--action);min-height:44px;}
+  .link svg{width:16px;height:16px;stroke:var(--action);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
+  a{color:inherit;text-decoration:none;}
+  /* ===== 콘텐츠 ===== */
+  .date{font-size:14.5px;color:var(--gray);font-weight:600;}
+  .meal{font-size:19px;font-weight:800;line-height:1.5;letter-spacing:-.4px;margin-top:8px;}
+  .none{font-size:17px;font-weight:700;color:var(--gray);line-height:1.6;margin-top:8px;}
+  .vol{margin-top:14px;padding-top:14px;border-top:1px solid var(--cream2);display:flex;align-items:center;gap:10px;}
+  .vol .vlabel{flex:none;font-size:12px;font-weight:800;color:#fff;background:var(--brand);padding:5px 11px;border-radius:20px;}
+  .vol .vname{font-size:16px;font-weight:800;letter-spacing:-.3px;color:var(--ink);}
+  /* ===== PC(넓을 때) 크게 ===== */
+  @media (min-width:480px){
+    .eyeline{font-size:20px;letter-spacing:.08em;}
+    .link{font-size:17px;}
+    .date{font-size:15.5px;}
+    .meal{font-size:21px;}
+    .vol .vname{font-size:17px;}
+  }
 </style>
 </head>
 <body>
@@ -51,7 +61,6 @@
   function render(items){
     var meal=document.getElementById('meal');
     if(items && items.length){
-      // 밥/국/반찬을 두 줄로: 앞 절반, 뒤 절반
       var half=Math.ceil(items.length/2);
       meal.innerHTML = items.slice(0,half).join(' · ') + '<br>' + items.slice(half).join(' · ');
     }else{
@@ -62,12 +71,8 @@
     }
     sendHeight();
   }
-
   function renderVol(name){
-    if(name){
-      document.getElementById('vname').textContent = name;
-      document.getElementById('vol').style.display = 'flex';
-    }
+    if(name){ document.getElementById('vname').textContent=name; document.getElementById('vol').style.display='flex'; }
     sendHeight();
   }
 
@@ -76,12 +81,8 @@
     .then(function(j){ render((j.days||{})[key]); renderVol((j.bongsa||{})[key]); })
     .catch(function(){ render(null); });
 
-  function sendHeight(){
-    var h=Math.ceil(document.querySelector('.card').getBoundingClientRect().height);
-    try{ parent.postMessage({bwMeal:'height',height:h},'*'); }catch(e){}
-  }
-  window.addEventListener('load',sendHeight);
-  window.addEventListener('resize',sendHeight);
+  function sendHeight(){ var h=Math.ceil(document.querySelector('.card').getBoundingClientRect().height); try{ parent.postMessage({bwMeal:'height',height:h},'*'); }catch(e){} }
+  window.addEventListener('load',sendHeight); window.addEventListener('resize',sendHeight);
   if(window.ResizeObserver) new ResizeObserver(sendHeight).observe(document.body);
   setTimeout(sendHeight,500); setTimeout(sendHeight,1500);
 })();
