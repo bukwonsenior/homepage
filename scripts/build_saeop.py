@@ -15,7 +15,7 @@ KST  = timezone(timedelta(hours=9))
 SHEET = "사업안내"
 DEFAULT_TEL = "033-747-0516"
 
-KINDS = {"부제", "설명", "정보", "절차제목", "절차", "안내", "내용제목", "내용"}
+KINDS = {"부제", "설명", "정보", "절차제목", "절차", "안내", "내용제목", "내용", "사진"}
 ICON_BY = [("대상","user"),("시간","clock"),("문의","phone"),("전화","phone"),
            ("신청","edit"),("방법","edit"),("접수","edit"),("장소","pin"),("기간","clock")]
 PRIVACY = [
@@ -109,6 +109,9 @@ def parse_file(path):
                 arr[-1]["항목"].append(text)
             else:
                 arr.append({"소제목": label, "항목": [text] if text else []})
+        elif kind == "사진":
+            if not text: errors.append(f"{r}행: 사진 줄에는 내용 칸에 파일명이 필요합니다 (예: sarye_1.jpg)"); continue
+            t.setdefault("사진", []).append({"파일": text, "캡션": label})
 
     for g in groups.values(): g.pop("_ti", None)
     return groups, errors
