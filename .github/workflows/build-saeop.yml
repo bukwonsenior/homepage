@@ -1,0 +1,34 @@
+name: 사업안내 엑셀 → JSON
+
+on:
+  push:
+    paths:
+      - "data/saeop/**"
+      - "scripts/build_saeop.py"
+      - ".github/workflows/build-saeop.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install openpyxl
+      - run: python scripts/build_saeop.py
+      - name: 바뀐 내용 저장
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/saeop/*.json
+          if git diff --cached --quiet; then
+            echo "바뀐 내용이 없습니다."; exit 0
+          fi
+          git commit -m "사업안내 자동 갱신"
+          git pull --rebase --autostash origin main
+          git push
