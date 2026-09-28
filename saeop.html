@@ -161,9 +161,6 @@
       h+='</div>';
     }
 
-    // 문의 버튼
-    h+='<a class="call" href="tel:'+esc(telNo).replace(/[^0-9]/g,'')+'">'+svg(ICONS.phone)+'전화로 문의하기</a>';
-
     document.getElementById('app').innerHTML=h;
     document.querySelectorAll('.tab').forEach(function(b){
       b.addEventListener('click',function(){ cur=+b.dataset.i; render(); window.scrollTo(0,0); });
