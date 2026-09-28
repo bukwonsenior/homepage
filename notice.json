@@ -1,8 +1,14 @@
 {
- "생성시각": "2026-09-28T06:28:47+09:00",
+ "생성시각": "2026-09-29T06:30:02+09:00",
  "출처": "https://www.bwsenior.or.kr/main/sub.html?pageCode=40",
  "전체보기": "https://www.bwsenior.or.kr/main/sub.html?pageCode=40",
  "items": [
+  {
+   "구분": "복지관",
+   "제목": "10월 휴일 안내",
+   "날짜": "2026-09-29",
+   "url": "https://www.bwsenior.or.kr/main/sub.html?Mode=view&boardID=www40&num=1626&page=&keyfield=&key=&bCate="
+  },
   {
    "구분": "복지관",
    "제목": "추석 휴관 일정 안내",
@@ -56,12 +62,6 @@
    "제목": "4층 디지털복합교육문화 공간 조성 공사 기간 연장 안내",
    "날짜": "2026-08-04",
    "url": "https://www.bwsenior.or.kr/main/sub.html?Mode=view&boardID=www40&num=1562&page=&keyfield=&key=&bCate="
-  },
-  {
-   "구분": "복지관",
-   "제목": "조리사(대체인력) 및 조리원 채용 최종 합격자 공고",
-   "날짜": "2026-07-30",
-   "url": "https://www.bwsenior.or.kr/main/sub.html?Mode=view&boardID=www40&num=1557&page=&keyfield=&key=&bCate="
   }
  ]
 }
