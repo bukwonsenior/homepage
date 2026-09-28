@@ -50,6 +50,26 @@ body{font-family:'Malgun Gothic','Noto Sans KR',sans-serif;background:#fff;color
 .detail-photo .no-photo{
   text-align:center;color:#bbb;font-size:14px;padding:20px;
 }
+.slider-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(0,0,0,0.4);color:#fff;
+  border:none;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.15s;z-index:2;
+}
+.slider-arrow:hover{background:rgba(0,0,0,0.6);}
+.slider-arrow.left{left:10px;}
+.slider-arrow.right{right:10px;}
+.slider-dots{
+  position:absolute;bottom:36px;left:50%;transform:translateX(-50%);
+  display:flex;gap:6px;z-index:2;
+}
+.slider-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:rgba(255,255,255,0.5);border:none;cursor:pointer;
+}
+.slider-dot.active{background:#fff;}
 
 .detail-info{
   flex:4;padding:28px 28px 24px;
@@ -108,19 +128,18 @@ body{font-family:'Malgun Gothic','Noto Sans KR',sans-serif;background:#fff;color
 
 <script>
 var FLOORS = [];
+var curPhotos = [], curPhotoIdx = 0;
 
-function ok(u){return u && u!=='' && u!=='PHOTO_URL';}
+function hasPhotos(rm){return rm.photos && rm.photos.length>0;}
 
-// JSON에서 데이터 로드
 fetch('facility.json?v='+Date.now())
   .then(function(r){return r.json();})
   .then(function(data){
     FLOORS = data;
     render();
-    // 첫 번째 층의 첫 번째 사진있는 실 자동 선택
     for(var fi=0;fi<FLOORS.length;fi++){
       for(var ri=0;ri<FLOORS[fi].rooms.length;ri++){
-        if(ok(FLOORS[fi].rooms[ri].photo)){sel(fi,ri);return;}
+        if(hasPhotos(FLOORS[fi].rooms[ri])){sel(fi,ri);return;}
       }
     }
   })
@@ -135,7 +154,7 @@ function render(){
     h+='<span class="floor-label">'+fl.badge+'</span>';
     if(fl.name) h+='<span class="floor-name">'+fl.name+'</span>';
     fl.rooms.forEach(function(rm,ri){
-      var hp=ok(rm.photo);
+      var hp=hasPhotos(rm);
       h+='<button class="room-btn'+(hp?' has-photo':'')+'" id="rb-'+fi+'-'+ri+'" onclick="sel('+fi+','+ri+')">'+rm.name+'</button>';
     });
     h+='</div>';
@@ -149,14 +168,18 @@ function sel(fi,ri){
   document.querySelectorAll('.room-btn').forEach(function(b){b.classList.remove('active');});
   document.getElementById('rb-'+fi+'-'+ri).classList.add('active');
 
+  // 사진 슬라이더
   var dp=document.getElementById('detail-photo');
-  if(ok(rm.photo)){
-    dp.innerHTML='<img src="'+rm.photo+'" alt="'+rm.name+'" onerror="this.parentNode.innerHTML=\'<div class=no-photo>사진을 불러올 수 없습니다</div>\'">'
-      +'<div class="ph-name">'+rm.name+'</div>';
+  if(hasPhotos(rm)){
+    curPhotos=rm.photos;
+    curPhotoIdx=0;
+    showPhoto(dp, rm.name);
   } else {
+    curPhotos=[];
     dp.innerHTML='<div class="no-photo">'+rm.name+'</div>';
   }
 
+  // 설명
   var di=document.getElementById('detail-info');
   var html='<div class="di-name">'+rm.name+'</div>';
   if(rm.role){
@@ -170,6 +193,37 @@ function sel(fi,ri){
   }
   di.innerHTML=html;
   nh();
+}
+
+function showPhoto(dp, name){
+  var h='<img src="'+curPhotos[curPhotoIdx]+'" alt="'+name+'" onerror="this.style.display=\'none\'">';
+  h+='<div class="ph-name">'+name+'</div>';
+
+  // 화살표 (2장 이상일 때)
+  if(curPhotos.length>1){
+    h+='<button class="slider-arrow left" onclick="slidePhoto(-1,\''+name+'\')">&lt;</button>';
+    h+='<button class="slider-arrow right" onclick="slidePhoto(1,\''+name+'\')">&gt;</button>';
+
+    // 점 표시
+    h+='<div class="slider-dots">';
+    for(var i=0;i<curPhotos.length;i++){
+      h+='<button class="slider-dot'+(i===curPhotoIdx?' active':'')+'" onclick="goPhoto('+i+',\''+name+'\')"></button>';
+    }
+    h+='</div>';
+  }
+  dp.innerHTML=h;
+}
+
+function slidePhoto(dir, name){
+  curPhotoIdx+=dir;
+  if(curPhotoIdx<0) curPhotoIdx=curPhotos.length-1;
+  if(curPhotoIdx>=curPhotos.length) curPhotoIdx=0;
+  showPhoto(document.getElementById('detail-photo'), name);
+}
+
+function goPhoto(idx, name){
+  curPhotoIdx=idx;
+  showPhoto(document.getElementById('detail-photo'), name);
 }
 
 function nh(){setTimeout(function(){window.parent.postMessage({type:'bwFacility',height:document.documentElement.scrollHeight},'*');},100);}

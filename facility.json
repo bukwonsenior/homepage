@@ -6,7 +6,9 @@
   "rooms": [
    {
     "name": "건물 전경",
-    "photo": "img/facility/exterior.jpg",
+    "photos": [
+     "img/facility/exterior.jpg"
+    ],
     "role": "",
     "usage": ""
    }
@@ -19,43 +21,47 @@
   "rooms": [
    {
     "name": "사무실",
-    "photo": "img/facility/f1_office.jpg",
+    "photos": [
+     "img/facility/f1_office.jpg"
+    ],
     "role": "",
     "usage": ""
    },
    {
     "name": "물리치료실",
-    "photo": "img/facility/f1_physio.jpg",
+    "photos": [
+     "img/facility/f1_physio.jpg"
+    ],
     "role": "이용자의 건강증진을 목적으로 물리치료 및 재활 프로그램 운영",
     "usage": "1,2층 키오스크를 통해 예약"
    },
    {
     "name": "섬김이 공간",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "건강관리실",
-    "photo": "",
+    "photos": [],
     "role": "이용자의 건강 상태 확인 및 관리",
     "usage": "1,2층 키오스크를 통해 예약"
    },
    {
     "name": "음악실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "상담실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "회의실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    }
@@ -68,43 +74,47 @@
   "rooms": [
    {
     "name": "온기식당",
-    "photo": "img/facility/f2_dining.jpg",
+    "photos": [
+     "img/facility/f2_dining.jpg"
+    ],
     "role": "",
     "usage": ""
    },
    {
     "name": "요리교실",
-    "photo": "img/facility/f2_cooking.jpg",
+    "photos": [
+     "img/facility/f2_cooking.jpg"
+    ],
     "role": "",
     "usage": ""
    },
    {
     "name": "서예실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "장기바둑실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "정보화실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "강사대기실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "주차장",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    }
@@ -117,37 +127,39 @@
   "rooms": [
    {
     "name": "다목적체육실",
-    "photo": "img/facility/f3_gym.jpg",
+    "photos": [
+     "img/facility/f3_gym.jpg"
+    ],
     "role": "",
     "usage": ""
    },
    {
     "name": "소강당",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "당구실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "포켓볼실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "프로그램실1",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "야외테라스",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    }
@@ -160,37 +172,39 @@
   "rooms": [
    {
     "name": "대강당",
-    "photo": "img/facility/f4_hall.jpg",
+    "photos": [
+     "img/facility/f4_hall.jpg"
+    ],
     "role": "",
     "usage": ""
    },
    {
     "name": "준비실",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "BW방송국",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "프로그램실2",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "작은도서관",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    },
    {
     "name": "장독뜰",
-    "photo": "",
+    "photos": [],
     "role": "",
     "usage": ""
    }

@@ -74,13 +74,15 @@ def main():
         if JUMIN.search(line):
             err(r, "주민등록번호로 보이는 값이 있습니다")
 
-        # 사진 경로 처리
-        photo_url = ""
+        # 사진 경로 처리 (쉼표 구분, 최대 3장)
+        photos = []
         if photo:
-            if photo.startswith("http"):
-                photo_url = photo
-            else:
-                photo_url = IMG_BASE + photo
+            parts = [p.strip() for p in photo.split(",") if p.strip()]
+            for p in parts[:3]:
+                if p.startswith("http"):
+                    photos.append(p)
+                else:
+                    photos.append(IMG_BASE + p)
 
         if code not in floors:
             # 층코드에서 배지 생성
@@ -92,7 +94,7 @@ def main():
 
         floors[code]["rooms"].append({
             "name": rname,
-            "photo": photo_url,
+            "photos": photos,
             "role": role,
             "usage": usage
         })
