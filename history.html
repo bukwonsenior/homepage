@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>연혁 · 북원노인종합복지관</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<style>
+  :root{--brand:#F38100;--action:#8A4200;--ink:#2B2320;--gray:#6B655F;--line:#EAE2D6;--soft:#FDF0E2;--white:#fff;--accent:#2E8B77;--shadow:0 6px 20px rgba(120,90,50,.08);--r:16px;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{background:#fff;}
+  body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1200px;margin:0;padding:6px 16px 30px;}
+
+  /* 탭 */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 22px;}
+  .tab{border:1.5px solid var(--line);background:var(--white);color:var(--gray);font-size:16px;font-weight:800;padding:11px 18px;border-radius:13px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow);}
+  .tab.on{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(243,129,0,.24);}
+
+  /* 타임라인 */
+  .tl{position:relative;padding-left:20px;}
+  .tl::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:3px;background:var(--line);border-radius:2px;}
+  .yr{display:flex;align-items:center;gap:12px;margin:26px 0 12px;}
+  .yr:first-child{margin-top:4px;}
+  .yr .n{font-size:30px;font-weight:800;letter-spacing:-1px;color:var(--ink);}
+  .ev{position:relative;display:flex;gap:16px;padding:9px 0;}
+  .ev::before{content:"";position:absolute;left:-19px;top:15px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--brand);box-sizing:border-box;}
+  .ev .d{flex:none;width:66px;font-size:15.5px;font-weight:800;color:var(--action);padding-top:1px;letter-spacing:-.3px;}
+  .ev .c{flex:1;font-size:16px;font-weight:600;line-height:1.55;color:#3c342d;word-break:keep-all;padding-top:1px;}
+  .none{color:var(--gray);font-size:16px;padding:30px 0;}
+  @media (min-width:480px){
+    .tab{font-size:17px;}
+    .yr .n{font-size:34px;}
+    .ev .d{width:74px;font-size:16px;}
+    .ev .c{font-size:17px;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tabs" id="tabs"></div>
+  <div class="tl" id="tl"></div>
+</div>
+<script>
+(function(){
+  var DATA=null, cur=0;
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function param(k){var m=new RegExp('[?&]'+k+'=([^&]+)').exec(location.search);return m?decodeURIComponent(m[1]):null;}
+
+  function renderTabs(){
+    document.getElementById('tabs').innerHTML=DATA.그룹.map(function(g,i){
+      return '<button class="tab'+(i===cur?' on':'')+'" data-i="'+i+'">'+esc(g.이름)+'</button>';
+    }).join('');
+    document.querySelectorAll('.tab').forEach(function(b){
+      b.addEventListener('click',function(){ cur=+b.dataset.i; render(); window.scrollTo(0,0); });
+    });
+  }
+  function render(){
+    renderTabs();
+    var g=DATA.그룹[cur], tl=document.getElementById('tl');
+    var items=(g&&g.항목)||[];
+    if(!items.length){ tl.innerHTML='<div class="none">등록된 연혁이 없습니다.</div>'; sendHeight(); return; }
+    var h='', lastYear=null;
+    items.forEach(function(it){
+      if(it.연도 && it.연도!==lastYear){
+        h+='<div class="yr"><span class="n">'+esc(it.연도)+'</span></div>';
+        lastYear=it.연도;
+      }
+      h+='<div class="ev"><div class="d">'+esc(it.날짜||'')+'</div><div class="c">'+esc(it.내용)+'</div></div>';
+    });
+    tl.innerHTML=h;
+    sendHeight();
+  }
+
+  fetch('data/history.json?t='+Date.now()).then(function(r){return r.json();}).then(function(j){
+    DATA=j;
+    if(!DATA.그룹||!DATA.그룹.length){ document.getElementById('tl').innerHTML='<div class="none">연혁을 불러오지 못했습니다.</div>'; return; }
+    var tp=param('tab'); if(tp){ DATA.그룹.forEach(function(g,i){ if(g.이름===tp) cur=i; }); }
+    render();
+  }).catch(function(){ document.getElementById('tl').innerHTML='<div class="none">연혁을 불러오지 못했습니다.</div>'; });
+
+  function sendHeight(){ try{var h=Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height)+12; parent.postMessage({bwHistory:'height',height:h},'*'); }catch(e){} }
+  window.addEventListener('load',sendHeight); window.addEventListener('resize',sendHeight);
+  setTimeout(sendHeight,600); setTimeout(sendHeight,1500);
+})();
+</script>
+</body>
+</html>
