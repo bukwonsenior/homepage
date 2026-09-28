@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>시설안내 - 북원노인종합복지관</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Malgun Gothic','Noto Sans KR',sans-serif;background:#fff;color:#333;}
+
+/* 시설정보 */
+.facility-info{padding:20px 20px 16px;border-bottom:1px solid #eee;}
+.facility-info h2{font-size:18px;font-weight:800;color:#222;margin-bottom:8px;padding-bottom:8px;border-bottom:3px solid #EA580C;display:inline-block;}
+.info-list{font-size:13px;color:#555;line-height:2;}
+.info-list .lbl{color:#888;}
+
+/* 층 + 실 버튼 영역 */
+.floor-nav{padding:8px 20px 12px;border-bottom:1px solid #eee;}
+.floor-row{display:flex;align-items:center;gap:8px;padding:6px 0;flex-wrap:wrap;}
+.floor-label{font-size:14px;font-weight:800;color:#EA580C;min-width:28px;flex-shrink:0;}
+.floor-name{font-size:13px;font-weight:700;color:#222;min-width:28px;flex-shrink:0;}
+.room-btn{
+  padding:5px 12px;font-size:12px;font-weight:500;
+  border:1.5px solid #ddd;border-radius:16px;
+  background:#fff;color:#777;cursor:pointer;
+  transition:all 0.15s;white-space:nowrap;
+}
+.room-btn:hover{border-color:#EA580C;color:#EA580C;}
+.room-btn.active{border-color:#EA580C;color:#EA580C;background:#FFF7ED;font-weight:700;}
+.room-btn.has-photo{color:#333;}
+
+/* 하단: 사진 + 설명 분할 (PC 1400px 기준) */
+.detail-area{display:flex;min-height:360px;border-bottom:1px solid #eee;}
+
+.detail-photo{
+  flex:6;background:#f5f5f5;
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+  min-height:360px;
+}
+.detail-photo img{
+  width:100%;height:100%;
+  object-fit:cover;display:block;
+}
+.detail-photo .ph-name{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,0.5));
+  color:#fff;padding:20px 16px 10px;font-size:14px;font-weight:600;
+}
+.detail-photo .no-photo{
+  text-align:center;color:#bbb;font-size:14px;padding:20px;
+}
+
+.detail-info{
+  flex:4;padding:28px 28px 24px;
+  overflow-y:auto;background:#fff;
+  border-left:1px solid #eee;
+}
+.di-name{font-size:20px;font-weight:800;color:#222;margin-bottom:16px;padding-bottom:12px;border-bottom:2px solid #EA580C;}
+.di-section{margin-bottom:16px;}
+.di-section-title{font-size:14px;font-weight:700;color:#EA580C;margin-bottom:6px;}
+.di-section-body{font-size:14px;color:#555;line-height:1.8;}
+.di-placeholder{color:#bbb;font-size:14px;padding-top:40px;text-align:center;}
+
+/* 모바일 370px 기준 */
+@media(max-width:500px){
+  .facility-info{padding:14px;}
+  .facility-info h2{font-size:15px;margin-bottom:6px;padding-bottom:6px;}
+  .info-list{font-size:11px;line-height:1.9;}
+  .floor-nav{padding:6px 14px 8px;}
+  .floor-row{gap:4px;padding:4px 0;}
+  .floor-label{font-size:12px;min-width:22px;}
+  .floor-name{font-size:11px;min-width:22px;}
+  .room-btn{padding:3px 7px;font-size:10px;border-radius:12px;}
+  .detail-area{flex-direction:column;min-height:auto;}
+  .detail-photo{min-height:200px;max-height:240px;flex:none;}
+  .detail-info{border-left:none;border-top:1px solid #eee;padding:14px;flex:none;}
+  .di-name{font-size:16px;margin-bottom:10px;padding-bottom:8px;}
+  .di-section-title{font-size:12px;}
+  .di-section-body{font-size:12px;}
+}
+</style>
+</head>
+<body>
+
+<div class="facility-info">
+  <h2>시설안내</h2>
+  <div class="info-list">
+    <span class="lbl">기관명 :</span> 북원노인종합복지관<br>
+    <span class="lbl">운영법인 :</span> 사회복지법인 밥상공동체복지재단<br>
+    <span class="lbl">설치신고 :</span> 2023. 5. 23.<br>
+    <span class="lbl">소재지 :</span> 강원도 원주시 흥양로50번길 5<br>
+    <span class="lbl">전화번호 :</span> 033-747-0516 / <span class="lbl">팩스 :</span> 033-747-0517<br>
+    <span class="lbl">시설규모 :</span> 지하 1층, 지상 4층, 연면적 2,879㎡
+  </div>
+</div>
+
+<div class="floor-nav" id="floor-nav"></div>
+
+<div class="detail-area">
+  <div class="detail-photo" id="detail-photo">
+    <div class="no-photo">실을 선택하세요</div>
+  </div>
+  <div class="detail-info" id="detail-info">
+    <div class="di-placeholder">실을 선택하면 상세 정보가 표시됩니다</div>
+  </div>
+</div>
+
+<script>
+var FLOORS = [];
+
+function ok(u){return u && u!=='' && u!=='PHOTO_URL';}
+
+// JSON에서 데이터 로드
+fetch('facility.json?v='+Date.now())
+  .then(function(r){return r.json();})
+  .then(function(data){
+    FLOORS = data;
+    render();
+    // 첫 번째 층의 첫 번째 사진있는 실 자동 선택
+    for(var fi=0;fi<FLOORS.length;fi++){
+      for(var ri=0;ri<FLOORS[fi].rooms.length;ri++){
+        if(ok(FLOORS[fi].rooms[ri].photo)){sel(fi,ri);return;}
+      }
+    }
+  })
+  .catch(function(e){
+    document.getElementById('floor-nav').innerHTML='<div style="padding:20px;color:#999;">데이터를 불러올 수 없습니다.</div>';
+  });
+
+function render(){
+  var nav=document.getElementById('floor-nav'),h='';
+  FLOORS.forEach(function(fl,fi){
+    h+='<div class="floor-row">';
+    h+='<span class="floor-label">'+fl.badge+'</span>';
+    if(fl.name) h+='<span class="floor-name">'+fl.name+'</span>';
+    fl.rooms.forEach(function(rm,ri){
+      var hp=ok(rm.photo);
+      h+='<button class="room-btn'+(hp?' has-photo':'')+'" id="rb-'+fi+'-'+ri+'" onclick="sel('+fi+','+ri+')">'+rm.name+'</button>';
+    });
+    h+='</div>';
+  });
+  nav.innerHTML=h;
+}
+
+function sel(fi,ri){
+  var rm=FLOORS[fi].rooms[ri];
+
+  document.querySelectorAll('.room-btn').forEach(function(b){b.classList.remove('active');});
+  document.getElementById('rb-'+fi+'-'+ri).classList.add('active');
+
+  var dp=document.getElementById('detail-photo');
+  if(ok(rm.photo)){
+    dp.innerHTML='<img src="'+rm.photo+'" alt="'+rm.name+'" onerror="this.parentNode.innerHTML=\'<div class=no-photo>사진을 불러올 수 없습니다</div>\'">'
+      +'<div class="ph-name">'+rm.name+'</div>';
+  } else {
+    dp.innerHTML='<div class="no-photo">'+rm.name+'</div>';
+  }
+
+  var di=document.getElementById('detail-info');
+  var html='<div class="di-name">'+rm.name+'</div>';
+  if(rm.role){
+    html+='<div class="di-section"><div class="di-section-title">장소 역할</div><div class="di-section-body">'+rm.role+'</div></div>';
+  }
+  if(rm.usage){
+    html+='<div class="di-section"><div class="di-section-title">이용방법</div><div class="di-section-body">'+rm.usage+'</div></div>';
+  }
+  if(!rm.role && !rm.usage){
+    html+='<div class="di-section"><div class="di-section-body" style="color:#bbb;">상세 정보 준비 중</div></div>';
+  }
+  di.innerHTML=html;
+  nh();
+}
+
+function nh(){setTimeout(function(){window.parent.postMessage({type:'bwFacility',height:document.documentElement.scrollHeight},'*');},100);}
+window.addEventListener('resize',nh);
+</script>
+</body>
+</html>
