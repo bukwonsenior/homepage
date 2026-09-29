@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>자주 묻는 질문 · 북원노인종합복지관</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<style>
+  :root{--brand:#F38100;--action:#8A4200;--ink:#2B2320;--gray:#6B655F;--line:#EAE2D6;--soft:#FDF0E2;--white:#fff;--shadow:0 6px 20px rgba(120,90,50,.08);--r:16px;}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{background:#fff;}
+  body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1000px;margin:0;padding:6px 16px 26px;}
+
+  /* 검색 */
+  .search{position:relative;margin:4px 0 16px;}
+  .search input{width:100%;height:clamp(50px,10vw,56px);border:1.5px solid var(--line);border-radius:28px;padding:0 20px 0 50px;font-size:clamp(16px,4vw,18px);font-family:inherit;color:var(--ink);background:var(--white);box-shadow:var(--shadow);}
+  .search input:focus{outline:none;border-color:var(--brand);}
+  .search svg{position:absolute;left:19px;top:50%;transform:translateY(-50%);width:22px;height:22px;stroke:var(--brand);fill:none;stroke-width:2.2;stroke-linecap:round;}
+
+  /* 분류 알약 */
+  .cats{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px;}
+  .cat{border:1.5px solid var(--line);background:var(--white);color:var(--gray);font-size:clamp(14.5px,3.8vw,16.5px);font-weight:700;padding:9px 18px;border-radius:22px;cursor:pointer;font-family:inherit;transition:all .12s;box-shadow:var(--shadow);}
+  .cat:hover{border-color:var(--brand);color:var(--action);}
+  .cat.on{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(243,129,0,.24);}
+
+  /* 아코디언 */
+  .list{display:flex;flex-direction:column;gap:10px;}
+  .qa{border:1px solid var(--line);border-radius:var(--r);background:var(--white);overflow:hidden;box-shadow:var(--shadow);}
+  .q{display:flex;align-items:center;gap:13px;padding:17px 18px;cursor:pointer;list-style:none;}
+  .q::-webkit-details-marker{display:none;}
+  .badge{flex:none;width:clamp(32px,7vw,36px);height:clamp(32px,7vw,36px);border-radius:50%;background:var(--brand);color:#fff;font-size:clamp(15px,3.8vw,17px);font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .qtext{flex:1;font-size:clamp(16px,4.2vw,19px);font-weight:700;line-height:1.4;letter-spacing:-.3px;word-break:keep-all;}
+  .tag{flex:none;font-size:clamp(11.5px,3vw,13px);font-weight:700;color:var(--action);background:var(--soft);padding:4px 11px;border-radius:12px;}
+  .plus{flex:none;width:24px;height:24px;stroke:var(--brand);fill:none;stroke-width:2.4;stroke-linecap:round;transition:transform .2s;}
+  details[open] .plus{transform:rotate(45deg);}
+  .a{display:flex;gap:13px;padding:0 18px 20px 18px;}
+  .abadge{flex:none;width:clamp(32px,7vw,36px);height:clamp(32px,7vw,36px);border-radius:50%;background:var(--soft);color:var(--action);font-size:clamp(15px,3.8vw,17px);font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .atext{flex:1;font-size:clamp(15px,3.9vw,17px);font-weight:500;line-height:1.7;color:#40382f;padding-top:5px;word-break:keep-all;white-space:pre-line;}
+  .atext a{color:var(--action);font-weight:700;}
+
+  .empty{text-align:center;color:var(--gray);font-size:clamp(15px,4vw,17px);font-weight:600;padding:40px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="search">
+    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+    <input type="text" id="search" placeholder="궁금한 내용을 검색하세요" autocomplete="off">
+  </div>
+  <div class="cats" id="cats"></div>
+  <div class="list" id="list"></div>
+</div>
+
+<script>
+(function(){
+  var DATA={categories:[],items:[]}, curCat='', curQ='';
+
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function fmtA(s){return esc(s).replace(/(0\d{1,2}[-\s]?\d{3,4}[-\s]?\d{4})/g,'<a href="tel:$1">$1</a>');}
+
+  function searching(){return curQ.trim().length>0;}
+
+  function renderCats(){
+    var wrap=document.getElementById('cats');
+    if(searching()){ wrap.innerHTML='<div style="font-size:clamp(14px,3.6vw,15.5px);color:#6B655F;font-weight:700;padding:4px 2px;">전체에서 검색 중…</div>'; return; }
+    wrap.innerHTML=DATA.categories.map(function(c){
+      return '<button class="cat'+(c===curCat?' on':'')+'" data-c="'+esc(c)+'">'+esc(c)+'</button>';
+    }).join('');
+  }
+
+  function renderList(){
+    var q=curQ.trim().toLowerCase();
+    var items=DATA.items.filter(function(it){
+      if(!q && it.cat!==curCat) return false;               // 평소: 선택 분류만
+      if(q && (it.q+' '+it.a).toLowerCase().indexOf(q)<0) return false; // 검색: 전체 대상
+      return true;
+    });
+    var list=document.getElementById('list');
+    if(!items.length){ list.innerHTML='<div class="empty">해당하는 질문이 없습니다.</div>'; sendHeight(); return; }
+    list.innerHTML=items.map(function(it){
+      return '<details class="qa"><summary class="q">'
+        + '<span class="badge">Q</span>'
+        + '<span class="qtext">'+esc(it.q)+'</span>'
+        + (it.cat?'<span class="tag">'+esc(it.cat)+'</span>':'')
+        + '<svg class="plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>'
+        + '</summary>'
+        + '<div class="a"><span class="abadge">A</span><div class="atext">'+fmtA(it.a)+'</div></div>'
+        + '</details>';
+    }).join('');
+    var dets=list.querySelectorAll('details');
+    dets.forEach(function(d){
+      d.addEventListener('toggle',function(){
+        if(d.open){ dets.forEach(function(o){ if(o!==d) o.open=false; }); }
+        sendHeight();
+      });
+    });
+    sendHeight();
+  }
+
+  document.getElementById('cats').addEventListener('click',function(e){
+    var b=e.target.closest('.cat'); if(!b) return;
+    curCat=b.dataset.c; renderCats(); renderList(); window.scrollTo(0,0);
+  });
+  document.getElementById('search').addEventListener('input',function(e){
+    curQ=e.target.value; renderCats(); renderList();
+  });
+
+  fetch('data/faq.json?t='+Date.now())
+    .then(function(r){return r.json();})
+    .then(function(j){ DATA={categories:j.categories||[],items:j.items||[]}; curCat=DATA.categories[0]||''; renderCats(); renderList(); })
+    .catch(function(){ document.getElementById('list').innerHTML='<div class="empty">내용을 불러오지 못했습니다.</div>'; sendHeight(); });
+
+  function sendHeight(){
+    try{ var h=Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height)+10; parent.postMessage({bwFaq:'height',height:h},'*'); }catch(e){}
+  }
+  window.addEventListener('load',sendHeight);
+  window.addEventListener('resize',sendHeight);
+  setTimeout(sendHeight,600); setTimeout(sendHeight,1600);
+})();
+</script>
+</body>
+</html>
