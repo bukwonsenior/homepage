@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>후원 안내 · 북원노인종합복지관</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<style>
+:root{--brand:#F38100;--action:#8A4200;--ink:#2B2320;--gray:#6B655F;--line:#EAE2D6;--soft:#FDF0E2;--white:#fff;--accent:#2E8B77;--accent-soft:#E4F1EC;--shadow:0 6px 20px rgba(120,90,50,.08);--r:18px;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{background:#fff;}
+body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+.wrap{max-width:1200px;margin:0;padding:6px 16px 30px;}
+a{color:inherit;text-decoration:none;}
+.hero{background:linear-gradient(135deg,#FFF6EC,#FDECD9);border:1px solid var(--line);border-radius:22px;padding:clamp(22px,4vw,34px);margin:8px 0 10px;}
+.hero .bc{font-size:clamp(13px,3.4vw,14px);color:var(--gray);font-weight:700;margin-bottom:10px;}
+.hero .bc b{color:var(--brand);}
+.hero h1{font-size:clamp(27px,6vw,38px);font-weight:800;letter-spacing:-1px;}
+.hero p{font-size:clamp(15.5px,4vw,18px);color:#5a5149;line-height:1.65;margin-top:12px;word-break:keep-all;max-width:820px;}
+.sec{font-size:clamp(20px,5vw,25px);font-weight:800;margin:32px 2px 16px;display:flex;align-items:center;gap:10px;letter-spacing:-.5px;}
+.sec::before{content:"";width:6px;height:clamp(22px,5vw,26px);border-radius:3px;background:var(--accent);}
+/* 후원 계좌 */
+.accts{display:grid;grid-template-columns:1fr;gap:12px;}
+@media(min-width:640px){.accts{grid-template-columns:repeat(3,1fr);}}
+.acct{background:var(--white);border:1.5px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px 20px;}
+.acct .bk{display:flex;align-items:center;gap:10px;font-size:clamp(15.5px,4vw,17.5px);font-weight:800;color:var(--action);}
+.acct .bk svg{width:22px;height:22px;stroke:var(--brand);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.acct .no{font-size:clamp(18px,4.6vw,22px);font-weight:800;letter-spacing:.3px;margin:10px 0 12px;word-break:keep-all;}
+.acct .cp{display:inline-flex;align-items:center;gap:7px;background:var(--soft);color:var(--action);border:none;font-family:inherit;font-size:clamp(13px,3.4vw,14.5px);font-weight:800;padding:8px 15px;border-radius:11px;cursor:pointer;}
+.acct .cp svg{width:16px;height:16px;stroke:var(--action);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.acct .cp.done{background:var(--accent-soft);color:var(--accent);}
+.holder{font-size:clamp(13px,3.4vw,14.5px);color:var(--gray);font-weight:700;margin-top:14px;}
+/* 탭 */
+.seg{display:flex;gap:8px;margin:20px 0 4px;}
+.seg button{flex:1;border:1.5px solid var(--line);background:var(--white);color:var(--gray);font-size:clamp(15px,4vw,18px);font-weight:800;padding:14px 6px;border-radius:14px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow);}
+.seg button.on{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(243,129,0,.24);}
+.hidden{display:none!important;}
+.cards{display:grid;grid-template-columns:1fr;gap:12px;}
+@media(min-width:600px){.cards{grid-template-columns:repeat(2,1fr);}}
+@media(min-width:980px){.cards{grid-template-columns:repeat(3,1fr);}}
+.vc{background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:18px 18px;}
+.vc .h{display:flex;align-items:center;gap:11px;margin-bottom:9px;}
+.vc .h .ic{flex:none;width:42px;height:42px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;}
+.vc .h .ic svg{width:22px;height:22px;stroke:var(--brand);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.vc .h b{font-size:clamp(16.5px,4.2vw,19px);font-weight:800;}
+.vc p{font-size:clamp(14.5px,3.8vw,16px);color:#4a4038;line-height:1.55;word-break:keep-all;}
+.benefits{background:var(--white);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:6px 20px;}
+.bf{display:flex;gap:13px;align-items:flex-start;padding:15px 0;border-bottom:1px solid var(--line);}
+.bf:last-child{border-bottom:none;}
+.bf .ic{flex:none;width:38px;height:38px;border-radius:11px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;margin-top:1px;}
+.bf .ic svg{width:20px;height:20px;stroke:var(--accent);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.bf .tx b{display:block;font-size:clamp(15.5px,4vw,17.5px);font-weight:800;color:#3c342d;margin-bottom:3px;}
+.bf .tx span{font-size:clamp(14px,3.6vw,15.5px);color:#5a5149;line-height:1.55;word-break:keep-all;}
+.note{background:var(--soft);border:1px solid #F3D6B0;border-radius:16px;padding:16px 18px;display:flex;gap:12px;margin-top:16px;align-items:flex-start;}
+.note svg{flex:none;width:24px;height:24px;stroke:var(--brand);fill:none;stroke-width:2.2;margin-top:1px;}
+.note b{font-size:clamp(14.5px,3.8vw,16.5px);font-weight:700;line-height:1.6;word-break:keep-all;}
+.qbox{display:flex;align-items:center;gap:13px;background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px 20px;margin-top:16px;}
+.qbox .ic{flex:none;width:44px;height:44px;border-radius:12px;background:var(--soft);display:flex;align-items:center;justify-content:center;}
+.qbox .ic svg{width:23px;height:23px;stroke:var(--brand);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.qbox .tx b{display:block;font-size:clamp(13.5px,3.5vw,15px);color:var(--gray);font-weight:700;}
+.qbox .tx a{font-size:clamp(19px,4.8vw,23px);font-weight:800;color:var(--action);}
+.cta{margin-top:30px;background:linear-gradient(135deg,#F7B26A,#F38100);border-radius:20px;padding:clamp(24px,5vw,34px);text-align:center;box-shadow:0 10px 30px rgba(243,129,0,.25);}
+.cta p{color:#fff;font-size:clamp(17px,4.4vw,21px);font-weight:800;line-height:1.5;word-break:keep-all;}
+.cta a{display:inline-flex;align-items:center;gap:9px;margin-top:16px;background:#fff;color:var(--action);font-size:clamp(16px,4.2vw,19px);font-weight:800;padding:14px 30px;border-radius:14px;box-shadow:0 6px 18px rgba(0,0,0,.14);}
+.cta a svg{width:20px;height:20px;stroke:var(--action);fill:none;stroke-width:2.4;}
+.none{color:var(--gray);padding:40px;text-align:center;}
+</style></head>
+<body>
+<div class="wrap" id="app"><div class="none">불러오는 중…</div></div>
+<script>
+(function(){
+  var APPLY_URL="https://www.bwsenior.or.kr/main/sub.html?pageCode=39"; // 후원 신청 게시판
+  var IC={
+    bank:'<path d="M3 21h18M4 21V10M20 21V10M4 10l8-6 8 6M9 21v-6h6v6"/>',
+    heart:'<path d="M20.8 5.6a5.5 5.5 0 00-7.8 0L12 6.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-6.6 1-1a5.5 5.5 0 000-7.8z"/>',
+    hand:'<path d="M11 13V5a1.5 1.5 0 013 0v6M14 11V4a1.5 1.5 0 013 0v8M8 13V7a1.5 1.5 0 013 0v4M17 8a1.5 1.5 0 013 0v6a7 7 0 01-7 7h-1a7 7 0 01-6-3.5L5 15"/>',
+    card:'<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>',
+    calendar:'<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+    box:'<path d="M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8"/>',
+    link:'<path d="M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1"/>',
+    receipt:'<path d="M5 3v18l2-1 2 1 2-1 2 1 2-1 2 1V3l-2 1-2-1-2 1-2-1-2 1z"/><path d="M9 8h6M9 12h6"/>',
+    gift:'<path d="M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7a3 3 0 10-3-3c0 2 3 3 3 3zM12 7a3 3 0 013-3c0 2-3 3-3 3z"/>',
+    bell:'<path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0"/>',
+    mega:'<path d="M3 11v2a1 1 0 001 1h2l4 4V6L6 10H4a1 1 0 00-1 1zM15 8a5 5 0 010 8"/>',
+    phone:'<path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012 4.2 2 2 0 014 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8 9.6a16 16 0 006 6l1.2-1.1a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6A2 2 0 0122 16.9z"/>',
+    check:'<path d="M20 6L9 17l-5-5"/>',
+    copy:'<rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/>'
+  };
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function svg(k){return '<svg viewBox="0 0 24 24">'+(IC[k]||IC.heart)+'</svg>';}
+
+  fetch('data/donation.json?t='+Date.now()).then(function(r){return r.json();}).then(render)
+    .catch(function(){document.getElementById('app').innerHTML='<div class="none">내용을 불러오지 못했습니다.</div>';});
+
+  function render(d){
+    var h='';
+    h+='<div class="hero"><div class="bc">봉사·후원 <b>›</b> 후원</div><h1>후원 안내</h1>';
+    if(d.소개) h+='<p>'+esc(d.소개)+'</p>';
+    h+='</div>';
+
+    // 후원 계좌 (항상 노출)
+    if(d.계좌&&d.계좌.length){
+      h+='<div class="sec">후원 계좌</div><div class="accts">';
+      d.계좌.forEach(function(a){
+        h+='<div class="acct"><div class="bk">'+svg('bank')+esc(a.은행)+'</div>'
+          +'<div class="no">'+esc(a.번호)+'</div>'
+          +'<button class="cp" data-no="'+esc(String(a.번호).replace(/[^0-9]/g,''))+'">'+svg('copy')+'계좌번호 복사</button></div>';
+      });
+      h+='</div>';
+      if(d.예금주) h+='<div class="holder">예금주 : '+esc(d.예금주)+'</div>';
+    }
+
+    // 탭
+    h+='<div class="seg" id="seg">'
+      +'<button data-v="way" class="on">후원 방법</button>'
+      +'<button data-v="kind">후원 종류</button>'
+      +'<button data-v="benefit">후원 혜택</button></div>';
+
+    // 후원 방법
+    h+='<div id="vWay">';
+    if(d.방법&&d.방법.length){
+      h+='<div class="sec">후원 방법</div><div class="cards">';
+      d.방법.forEach(function(v){
+        h+='<div class="vc"><div class="h"><div class="ic">'+svg(v.아이콘)+'</div><b>'+esc(v.이름)+'</b></div>'
+          +(v.설명?'<p>'+esc(v.설명)+'</p>':'')+'</div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+
+    // 후원 종류
+    h+='<div id="vKind" class="hidden">';
+    if(d.종류&&d.종류.length){
+      h+='<div class="sec">후원 종류</div><div class="cards">';
+      d.종류.forEach(function(v){
+        h+='<div class="vc"><div class="h"><div class="ic">'+svg(v.아이콘)+'</div><b>'+esc(v.이름)+'</b></div>'
+          +(v.설명?'<p>'+esc(v.설명)+'</p>':'')+'</div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+
+    // 후원 혜택
+    h+='<div id="vBenefit" class="hidden">';
+    if(d.혜택&&d.혜택.length){
+      h+='<div class="sec">후원 혜택</div><div class="benefits">';
+      d.혜택.forEach(function(v){
+        h+='<div class="bf"><div class="ic">'+svg(v.아이콘)+'</div><div class="tx"><b>'+esc(v.이름)+'</b>'
+          +(v.설명?'<span>'+esc(v.설명)+'</span>':'')+'</div></div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+
+    // 문의 (항상 노출)
+    if(d.문의){
+      h+='<div class="qbox"><div class="ic">'+svg('phone')+'</div>'
+        +'<div class="tx"><b>후원 문의</b><a href="tel:'+String(d.문의).replace(/[^0-9]/g,'')+'">'+esc(d.문의)+'</a></div></div>';
+    }
+    if(d.안내) h+='<div class="note"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 12h1v4h1"/></svg><b>'+esc(d.안내)+'</b></div>';
+
+    h+='<div class="cta"><p>어르신들의 든든한 이웃이 되어 주세요</p>'
+      +'<a href="'+APPLY_URL+'" target="_top"><svg viewBox="0 0 24 24"><path d="M20.8 5.6a5.5 5.5 0 00-7.8 0L12 6.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-6.6 1-1a5.5 5.5 0 000-7.8z"/></svg>후원 신청하기</a></div>';
+
+    document.getElementById('app').innerHTML=h;
+
+    // 복사 버튼
+    document.querySelectorAll('.cp').forEach(function(btn){
+      btn.addEventListener('click',function(){
+        var no=btn.dataset.no;
+        var done=function(){var o=btn.innerHTML;btn.classList.add('done');btn.innerHTML=svg('check')+'복사됨';setTimeout(function(){btn.classList.remove('done');btn.innerHTML=o;},1500);};
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(no).then(done).catch(fallback);}else{fallback();}
+        function fallback(){try{var t=document.createElement('textarea');t.value=no;document.body.appendChild(t);t.select();document.execCommand('copy');document.body.removeChild(t);done();}catch(e){}}
+      });
+    });
+
+    var seg=document.getElementById('seg');
+    seg.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click',function(){
+        seg.querySelectorAll('button').forEach(function(x){x.classList.remove('on');});
+        b.classList.add('on');
+        var v=b.dataset.v;
+        document.getElementById('vWay').classList.toggle('hidden', v!=='way');
+        document.getElementById('vKind').classList.toggle('hidden', v!=='kind');
+        document.getElementById('vBenefit').classList.toggle('hidden', v!=='benefit');
+        window.scrollTo(0,0); sendHeight();
+      });
+    });
+    sendHeight();
+  }
+  function sendHeight(){try{var h=Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height)+12;parent.postMessage({bwDonation:'height',height:h},'*');}catch(e){}}
+  window.addEventListener('load',sendHeight);window.addEventListener('resize',sendHeight);
+  setTimeout(sendHeight,600);setTimeout(sendHeight,1500);
+})();
+</script>
+</body></html>
