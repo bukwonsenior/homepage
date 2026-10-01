@@ -295,16 +295,37 @@
   }
   window.addEventListener('hashchange',route);
 
-  fetch('data/programs.json?t='+Date.now()).then(function(r){return r.json();}).then(function(j){
-    DATA=j; curCat=CATS[0];
+  // 편집기 규약: render(데이터) + BW_LOAD 마커 + window.__bwHi(미리보기 강조)
+  function render(j){
+    DATA=j; DATA.프로그램=DATA.프로그램||[]; if(!curCat) curCat=CATS[0];
     renderSeg(); applyTopView();
     renderApply(); renderTabs(); renderFilters(); renderList(); route();
-    document.getElementById('tabs').addEventListener('click',function(e){
-      var b=e.target.closest('.tab'); if(!b)return; curCat=b.dataset.c;
-      curPage=1; fDay=''; fPlace=''; fFee='';   // 탭 바꾸면 필터 초기화
-      renderTabs(); renderFilters(); renderList();
-    });
-  }).catch(function(){ document.getElementById('plist').innerHTML='<div class="empty">프로그램 정보를 불러오지 못했습니다.</div>'; });
+  }
+  document.getElementById('tabs').addEventListener('click',function(e){
+    var b=e.target.closest('.tab'); if(!b)return; curCat=b.dataset.c;
+    curPage=1; fDay=''; fPlace=''; fFee='';   // 탭 바꾸면 필터 초기화
+    renderTabs(); renderFilters(); renderList();
+  });
+  window.__bwHi=function(m){
+    if(!DATA) return true;
+    var lv=document.getElementById('listView'), dv=document.getElementById('detailView');
+    function mark(el){ if(el){ el.classList.add('bwhi'); el.scrollIntoView({block:'center'}); } }
+    if(m.key){
+      if(DATA.프로그램.some(function(x){return x.id===m.key;})){
+        lv.classList.add('hidden'); dv.classList.remove('hidden'); renderDetail(m.key); mark(dv.querySelector('.hero')); return true;
+      }
+    }
+    dv.classList.add('hidden'); lv.classList.remove('hidden');
+    if(m.tab!=null && m.tab>=0 && CATS[m.tab]){
+      topView='list'; applyTopView(); curCat=CATS[m.tab]; curPage=1; fDay=''; fPlace=''; fFee='';
+      renderTabs(); renderFilters(); renderList(); return true;
+    }
+    if(m.sel){ topView='apply'; applyTopView(); mark(document.querySelector(m.sel)); return true; }
+    return false;
+  };
+
+  /*BW_LOAD*/fetch('data/programs.json?t='+Date.now()).then(function(r){return r.json();}).then(render)
+  .catch(function(){ document.getElementById('plist').innerHTML='<div class="empty">프로그램 정보를 불러오지 못했습니다.</div>'; });/*BW_LOAD_END*/
 
   function sendHeight(){ try{var h=Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height)+10; parent.postMessage({bwPrograms:'height',height:h},'*'); }catch(e){} }
   window.addEventListener('load',sendHeight); window.addEventListener('resize',sendHeight);
