@@ -21,7 +21,7 @@ ICONS = {
  "phone","home","meal","talk","user","users","clean","music","health","pill","walk","shield","star",
  "heart","hand","gift","bread","coffee","mic","mega","bell","mail","book","edit","camera","calendar",
  "clock","car","bus","mappin","leaf","flower","sun","smile","scissors","wrench","bank","card","box",
- "link","receipt","check"}
+ "link","receipt","pin","route","check"}
 
 def s(v): return "" if v is None else str(v).strip()
 
