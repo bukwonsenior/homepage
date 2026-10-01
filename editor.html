@@ -14,6 +14,8 @@ html,body{height:100%;background:var(--bg);color:var(--ink);}
 .btn{border:1.5px solid var(--line);background:#fff;color:var(--ink);font-size:13.5px;font-weight:700;padding:8px 13px;border-radius:10px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
 .btn:hover{border-color:var(--brand);}
 .btn.pri{background:var(--brand);border-color:var(--brand);color:#fff;}
+.btn.ok{border-color:#2E8B77;color:#2E8B77;}
+.btn:disabled{opacity:.6;cursor:wait;}
 .btn input{display:none;}
 .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;}
 .seg button{border:none;background:#fff;font-weight:700;font-size:13px;padding:8px 13px;cursor:pointer;color:var(--gray);}
@@ -103,7 +105,9 @@ tr.dragging{opacity:.35;} tr.over td{box-shadow:inset 0 3px 0 var(--brand);}
   <label class="btn">📂 내 엑셀 열기<input type="file" id="file" accept=".xlsx"></label>
   <div class="seg" id="devseg"><button data-d="pc" class="on">PC 화면</button><button data-d="mo">모바일</button></div>
   <div class="sp"></div>
-  <button class="btn pri" id="dl">💾 수정한 엑셀 내려받기</button>
+  <button class="btn" id="ghset" title="GitHub 연결 설정">🔑 <span id="ghst">GitHub 연결</span></button>
+  <button class="btn" id="dl">💾 엑셀 내려받기</button>
+  <button class="btn pri" id="ghup">⬆ 홈페이지에 바로 올리기</button>
 </div>
 <div class="wrap">
   <div class="left">
@@ -275,6 +279,30 @@ function floorCode(n){var m=n.match(/^(\d+)\s*층$/);if(m)return['f'+m[1],m[1]+'
 PAGES.facility=page({
   group:'기관소개', name:'시설안내', crumb:'기관소개 › 시설안내', html:'facility-guide.html', xlsx:'북원_시설안내.xlsx', sheet:'시설안내', img:'img/facility/', imgVar:false,
   map:[['게시',0],['층명',1],['실명',3],['사진',7],['역할',4],['이용방법',5]], headKey:'실명', fixedKind:'실', tabWord:'층',
+  top:[{k:'기관정보',label:'기관 정보 (맨 위 기관명·주소·전화)',cols:[{c:3,h:'항목'},{c:4,h:'내용'}],hi:'.facility-info',
+    hiKey:function(r){return 'i:'+rows.filter(function(x){return x[2]==='기관정보'&&(x[3]||x[4]);}).indexOf(r);},tip:'한 줄 = 한 항목, 순서대로 나와요.'}],
+  readWB:function(wb){
+    var out=[],ws=wb.Sheets['시설안내'];if(!ws)throw '\'시설안내\' 시트가 없어요';
+    var a=XLSX.utils.sheet_to_json(ws,{header:1,defval:''}),H=(a[3]||[]).map(function(x){return String(x).trim();});
+    var M=[['게시',0],['층명',1],['실명',3],['사진',7],['역할',4],['이용방법',5]],ci=M.map(function(m){return H.indexOf(m[0]);});
+    if(ci[2]<0)throw '시설안내 시트 4행에 머리글(실명…)이 없어요';
+    for(var i=4;i<a.length;i++){var row=a[i];if(!row.some(function(c){return String(c).trim();}))continue;var r=['','','실','','','','','','',''];
+      M.forEach(function(m,j){if(ci[j]>=0)r[m[1]]=String(row[ci[j]]).trim();});if(!r[0])r[0]='O';out.push(r);}
+    var wi=wb.Sheets['기관정보'];
+    if(wi){var b=XLSX.utils.sheet_to_json(wi,{header:1,defval:''});for(i=4;i<b.length;i++){var k=String(b[i][0]||'').trim(),v=String(b[i][1]||'').trim();if(k||v)out.push(['O','','기관정보',k,v,'','','','','']);}}
+    return out;
+  },
+  writeWB:function(rows,orig){
+    var wb=XLSX.utils.book_new();
+    function head(n,def){var ws=orig&&orig.Sheets[n];var a=ws?XLSX.utils.sheet_to_json(ws,{header:1,defval:''}).slice(0,4):[];while(a.length<4)a.push([]);a[3]=def;return a;}
+    if(orig&&orig.Sheets['사용법'])XLSX.utils.book_append_sheet(wb,orig.Sheets['사용법'],'사용법');
+    var A=head('시설안내',['게시','층명','실명','사진','역할','이용방법']).concat(rows.filter(function(r){return r[2]==='실';}).map(function(r){return [r[0],r[1],r[3],r[7],r[4],r[5]];}));
+    var ws=XLSX.utils.aoa_to_sheet(A);ws['!cols']=[7,10,16,30,50,32].map(function(w){return{wch:w};});XLSX.utils.book_append_sheet(wb,ws,'시설안내');
+    var I=head('기관정보',['항목','내용']);if(!I[0].length)I[0]=['기관 정보  —  시설안내 맨 위에 나오는 내용'];
+    I=I.concat(rows.filter(function(r){return r[2]==='기관정보'&&(r[3]||r[4]);}).map(function(r){return [r[3],r[4]];}));
+    ws=XLSX.utils.aoa_to_sheet(I);ws['!cols']=[{wch:14},{wch:50}];XLSX.utils.book_append_sheet(wb,ws,'기관정보');
+    return wb;
+  },
   tab:[{k:'실',label:'실(방)',req:3,cols:[{c:3,h:'실 이름'},{c:7,h:'사진 (쉼표로 최대 3장)',photos:1},{c:4,h:'장소 역할',ta:1},{c:5,h:'이용방법',ta:1}],hi:'.room-btn',
     tip:'층 이름: 전경 / 1층 / 2층 … · 사진이 없으면 비워 두세요(화면에 "사진 준비 중") · 📷로 사진을 고르면 미리보기에 바로 보여요'}],
   guide:['■ 한 줄 = 실(방) 하나. 층명이 같은 줄끼리 한 층으로 묶이고 나온 순서대로 화면에 나옵니다.','■ 사진: img/facility/ 폴더의 파일명. 여러 장은 쉼표로 (최대 3장).','■ 게시: O=보임 / X=숨김'],
@@ -283,7 +311,8 @@ PAGES.facility=page({
     rows.forEach(function(r){ if(isX(r)||!r[1]||!r[3])return; var fc=floorCode(r[1]);
       if(!m[r[1]]){m[r[1]]={code:fc[0],badge:fc[1],name:r[1],rooms:[]};F.push(m[r[1]]);}
       m[r[1]].rooms.push({name:r[3],photos:splitPh(r[7]).slice(0,3).map(function(f){return /^http/.test(f)?f:url(r,f);}),role:r[4],usage:r[5]}); });
-    F.탭=F.map(function(f){return {이름:f.name};}); return F;
+    var info=rows.filter(function(r){return r[2]==='기관정보'&&(r[3]||r[4]);}).map(function(r){return {항목:r[3],내용:r[4]};});
+    return {기관정보:info,층:F,탭:F.map(function(f){return {이름:f.name};})};
   }
 });
 
@@ -307,13 +336,13 @@ PAGES.programs=page({
   nslots:20, map:PG_COLS, fixedTabs:['평생교육','동아리','특강'], tabWord:'구분', privacy:true,
   top:[
     {k:'신청안내',label:'신청 안내 (수강신청 안내 화면)',fixed:1,cols:[{c:3,h:'항목',ro:1},{c:4,h:'내용',ta:1},{c:5,h:'설명',ro:1}],hi:'#applyBox',hiKey:function(r){return 'g:'+r[3];},
-      tip:'항목 이름은 바꿀 수 없어요. 날짜는 2026-08-03 처럼 · 현재상태는 신청기간중 / 신청기간아님'},
+      tip:'항목 이름은 바꿀 수 없어요. 날짜는 2026-08-03 처럼 · 현재상태는 신청기간중 / 신청기간아님 · 이용절차·유의사항은 한 줄에 하나씩(엔터)'},
     {k:'안내문',label:'문의사항 (프로그램 [문의사항] 화면 + 자주 묻는 질문)',bottom:1,cols:[{c:3,h:'제목'},{c:4,h:'내용',ta:1}],hi:'#applyBox',
       hiKey:function(r){return 'n:'+rows.filter(function(x){return x[2]==='안내문'&&!isX(x)&&x[3];}).indexOf(r);},
       tip:'누르면 펼쳐지는 안내예요. 자주 묻는 질문 › 프로그램에도 자동으로 함께 나와요 → 제목은 질문 형태로 써 주세요.'}
   ],
   tab:[{k:'프로그램',label:'프로그램',form:1,req:3,hi:'.hero',hiKey:function(r){return r[1]+'/'+r[3];},
-    tip:'홈페이지에는 요일→시작시간 순으로 자동 정렬돼요 · 내리려면 게시를 X로',
+    tip:'홈페이지에는 요일→시작시간 순으로 자동 정렬돼요 · 내리려면 게시를 X로 · 운영종료 날짜가 지나면 자동으로 숨겨져요',
     cols:[{c:3,h:'프로그램명',w:2},{c:5,h:'분류',opts:['','정보화·어학','노래·댄스·악기','운동','서예·공예','미술']},{c:7,h:'강사'},
           {c:8,h:'요일 (월, 수)'},{c:9,h:'시작 (09:30)'},{c:10,h:'종료 (11:00)'},{c:11,h:'장소'},
           {c:12,h:'정원'},{c:13,h:'수강료 (0=무료)'},{c:14,h:'재료비',opts:['없음','별도']},{c:15,h:'운영시작'},{c:16,h:'운영종료'},
@@ -368,7 +397,7 @@ PAGES.programs=page({
     if(d1==='INVALID')errs.push(ln+': 운영시작 날짜를 읽을 수 없어요 (2026-08-19 처럼)');
     if(d2==='INVALID')errs.push(ln+': 운영종료 날짜를 읽을 수 없어요 (2026-08-19 처럼)');
     if(d1&&d2&&d1!=='INVALID'&&d2!=='INVALID'&&d1>d2)errs.push(ln+': 운영종료가 운영시작보다 빨라요');
-    if(d2&&d2!=='INVALID'&&d2<new Date().toISOString().slice(0,10))warns.push(ln+': '+esc(r[3])+' — 운영종료('+d2+')가 지났어요. 홈페이지에서 자동으로 안 내려가니 게시를 X로 바꿔 주세요');
+    if(d2&&d2!=='INVALID'&&d2<new Date().toISOString().slice(0,10))warns.push(ln+': '+esc(r[3])+' — 운영종료('+d2+')가 지나 홈페이지에서 자동으로 숨겨져 있어요 (지워도 되고 그대로 둬도 돼요)');
     var dup=rows.filter(function(x){return x!==r&&!isX(x)&&x[2]==='프로그램'&&x[1]===r[1]&&x[3]===r[3];});
     if(dup.length)errs.push(ln+': "'+esc(r[3])+'" 이름이 같은 구분 안에 또 있어요 (1반/2반처럼 다르게)');
   },
@@ -389,7 +418,7 @@ PAGES.programs=page({
 
 /* ================= 상태 ================= */
 var P=null,pageKey=null,rows=[],tpl=null,tplOld=false,dev='pc',curTab='',lastHi=null,dirty=false;
-var blobs=new Map(), fblobs=new Map(), heights=[], renderTimer=null, lastDoc=null;
+var blobs=new Map(), fblobs=new Map(), upFiles=new Map(), heights=[], renderTimer=null, lastDoc=null;
 
 /* ================= 유틸 ================= */
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -414,7 +443,7 @@ function rendered(){return lastDoc?lastDoc.탭.map(function(t){return t.이름||
   s.addEventListener('change',function(){if(dirty&&!confirm('내려받지 않은 수정 내용이 있어요. 다른 페이지로 넘어갈까요?')){s.value=pageKey;return;}setPage(s.value);});
 })();
 function setPage(k){
-  pageKey=k;P=PAGES[k];rows=[];blobs.clear();fblobs.clear();curTab='';lastHi=null;dirty=false;tpl=null;heights=[];lastDoc=null;
+  pageKey=k;P=PAGES[k];rows=[];blobs.clear();fblobs.clear();upFiles.clear();curTab='';lastHi=null;dirty=false;tpl=null;heights=[];lastDoc=null;
   document.getElementById('pagesel').value=k;
   document.getElementById('pvtitle').textContent='실제 홈페이지 미리보기 ('+P.crumb+')';
   document.getElementById('hint').innerHTML='<b>'+P.name+'</b> 페이지를 편집합니다. 왼쪽을 고치면 <b>오른쪽 화면이 바로</b> 바뀌어요.<br>다 고쳤으면 <b>[💾 수정한 엑셀 내려받기]</b> → GitHub <code>'+P.xlsx+'</code>에 같은 이름으로 덮어쓰면 반영돼요.'
@@ -560,7 +589,7 @@ function addPh(i,c,files){
   var list=splitPh(rows[i][c]);
   for(var n=0;n<files.length;n++){var f=files[n],name=f.name.replace(/\s+/g,'_');
     if(f.size>2*1024*1024)toast('⚠️ '+esc(f.name)+' 은(는) 2MB가 넘어요. 홈페이지가 느려질 수 있어요.',5000);
-    fblobs.set(name,URL.createObjectURL(f));if(list.indexOf(name)<0)list.push(name);}
+    fblobs.set(name,URL.createObjectURL(f));upFiles.set(name,f);if(list.indexOf(name)<0)list.push(name);}
   if(list.length>3)toast('⚠️ 사진은 3장까지만 보여요.',4000);
   upd(i,c,list.join(', '),1);
 }
@@ -579,7 +608,7 @@ function addPhotos(files){
     var f=files[n],name=f.name.replace(/\s+/g,'_');
     if(f.size>2*1024*1024)toast('⚠️ '+esc(f.name)+' 은(는) 2MB가 넘어요. 홈페이지가 느려질 수 있어요.',5000);
     var r=blank(curTab,'사진');r[P.photo.file]=name;
-    blobs.set(r,URL.createObjectURL(f));
+    blobs.set(r,URL.createObjectURL(f));upFiles.set(name,f);
     if(at<0)rows.push(r);else rows.splice(++at,0,r);
   }
   mark();buildEditor();render(true);
@@ -714,12 +743,10 @@ window.addEventListener('resize',function(){sizePv(null);});
 window.addEventListener('beforeunload',function(e){if(dirty){e.preventDefault();e.returnValue='';}});
 
 /* ================= 엑셀 내려받기 ================= */
-document.getElementById('dl').addEventListener('click',function(){
-  if(!rows.length){alert('먼저 내용을 불러와 주세요.');return;}
-  if(validate().length&&!confirm('고쳐야 할 곳이 남아 있어요. 이대로 올리면 홈페이지가 바뀌지 않아요(자동 검사에서 멈춤). 그래도 내려받을까요?'))return;
-  if(P.writeWB){var fn=P.xlsx.split('/').pop(),bl=new Blob([XLSX.write(P.writeWB(rows,origWB),{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-    var aa=document.createElement('a');aa.href=URL.createObjectURL(bl);aa.download=fn;document.body.appendChild(aa);aa.click();setTimeout(function(){URL.revokeObjectURL(aa.href);aa.remove();},1500);
-    dirty=false;toast('💾 <b>'+fn+'</b> 내려받았어요 → GitHub <b>'+P.xlsx+'</b>에 덮어쓰기',9000);return;}
+/* ================= 엑셀 만들기 (내려받기·바로 올리기 공용) ================= */
+var XMIME='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+function makeWB(){
+  if(P.writeWB)return P.writeWB(rows,origWB);
   var HEAD=P.map.map(function(m){return m[0];});
   var aoa=[[P.name+' 페이지 내용  —  한 줄 = 화면의 한 조각'],['"홈페이지 편집기"로 고친 파일입니다. 편집기로 여는 것을 권장합니다.'],[],HEAD]
     .concat(rows.map(function(r){return P.map.map(function(m){var v=r[m[1]];return v==null?'':v;});}));
@@ -729,15 +756,90 @@ document.getElementById('dl').addEventListener('click',function(){
     P.top.length?['■ 종류(탭 있음): '+kindsOf('tab').join(' · ')]:['■ 모든 줄에 탭 이름이 필요합니다.'],
     ['■ 사진 파일은 GitHub '+P.img+' 폴더에 같은 이름으로 올립니다.'],['■ 아이콘: '+Object.keys(ICONS).join(' ')],['■ 게시: O=보임 / X=숨김']];
   var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(g),'사용법');XLSX.utils.book_append_sheet(wb,ws,P.sheet);
-  var fname=P.xlsx.split('/').pop();
-  var blob=new Blob([XLSX.write(wb,{bookType:'xlsx',type:'array'})],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  return wb;
+}
+function xlsxBytes(){return new Uint8Array(XLSX.write(makeWB(),{bookType:'xlsx',type:'array'}));}
+function newPhotos(){  // 이번에 새로 고른 사진 중, 아직 내용에 쓰이고 있는 것만
+  var used={};rows.forEach(function(r){if(isX(r))return;r.forEach(function(v){splitPh(v).forEach(function(f){used[f]=1;});});});
+  var out=[];upFiles.forEach(function(f,n){if(used[n])out.push({name:n,file:f});});return out;
+}
+document.getElementById('dl').addEventListener('click',function(){
+  if(!rows.length){alert('먼저 내용을 불러와 주세요.');return;}
+  if(validate().length&&!confirm('고쳐야 할 곳이 남아 있어요. 이대로 올리면 홈페이지가 바뀌지 않아요(자동 검사에서 멈춤). 그래도 내려받을까요?'))return;
+  var fname=P.xlsx.split('/').pop(),blob=new Blob([xlsxBytes()],{type:XMIME});
   var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;document.body.appendChild(a);a.click();
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
   dirty=false;
-  var news=rows.filter(function(r){return blobs.get(r);}).map(pf);
-  fblobs.forEach(function(u,n){if(rows.some(function(r){return r.some(function(v){return splitPh(v).indexOf(n)>=0;});}))news.push(n);});
+  var news=newPhotos().map(function(x){return x.name;});
   toast('💾 <b>'+fname+'</b> 내려받았어요 → GitHub <b>'+P.xlsx+'</b>에 덮어쓰기'+(news.length?'<br>📷 새 사진 '+news.length+'장도 <b>'+P.img+'</b>에 올려 주세요: '+news.map(esc).join(', '):''),9000);
 });
+
+/* ================= GitHub에 바로 올리기 =================
+   담당자 PC에 'GitHub 토큰'(이 저장소 Contents 읽기·쓰기 권한만)을 한 번 붙여넣어 두면,
+   엑셀 + 새 사진을 커밋 1번으로 올린다 → GitHub Actions가 1~2분 안에 홈페이지에 반영. */
+var GH_API=QS.get('api')||'https://api.github.com', GH_REPO=QS.get('repo')||'bukwonsenior/homepage', GH_BRANCH='main';
+function ghToken(){try{return localStorage.getItem('bw_gh_token')||'';}catch(e){return '';}}
+function ghSetToken(v){try{if(v)localStorage.setItem('bw_gh_token',v);else localStorage.removeItem('bw_gh_token');}catch(e){}}
+function ghStatus(){document.getElementById('ghst').textContent=ghToken()?'GitHub 연결됨':'GitHub 연결';document.getElementById('ghset').classList.toggle('ok',!!ghToken());}
+function gh(method,path,body){
+  return fetch(GH_API+'/repos/'+GH_REPO+path,{method:method,headers:{'Authorization':'Bearer '+ghToken(),'Accept':'application/vnd.github+json','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined})
+    .then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(!r.ok){var e=new Error((j&&j.message)||('HTTP '+r.status));e.status=r.status;throw e;}return j;});});
+}
+function ghErr(e){
+  if(e.status===401)return '토큰이 맞지 않거나 기한이 지났어요. [GitHub 연결]에서 새 토큰을 넣어 주세요.';
+  if(e.status===403||e.status===404)return '이 토큰에 저장소 쓰기 권한이 없어요. 토큰 권한(Contents: Read and write, 저장소 '+GH_REPO+')을 확인해 주세요.';
+  if(e.status===422||e.status===409)return '그사이 다른 사람이 먼저 올렸어요. 잠시 뒤 다시 눌러 주세요.';
+  return '올리지 못했어요 ('+esc(e.message||e)+'). 인터넷 연결을 확인하거나 [엑셀 내려받기]로 올려 주세요.';
+}
+document.getElementById('ghset').addEventListener('click',function(){
+  var cur=ghToken();
+  var v=prompt((cur?'지금 이 PC는 GitHub에 연결돼 있어요.\n새 토큰을 붙여넣으면 바뀌고, 비우고 확인하면 연결이 해제돼요.\n\n':'')+'GitHub 토큰을 붙여넣어 주세요 (github_pat_로 시작).\n※ 이 PC의 이 브라우저에만 저장돼요. 공용 PC에서는 쓰지 마세요.',cur?'':'');
+  if(v===null)return;v=v.trim();
+  if(!v){ghSetToken('');ghStatus();toast('GitHub 연결을 해제했어요.');return;}
+  ghSetToken(v);ghStatus();
+  gh('GET','').then(function(j){
+    if(j.permissions&&j.permissions.push===false)throw {status:403};
+    toast('✅ GitHub 연결 완료 ('+esc(j.full_name||GH_REPO)+')');
+  }).catch(function(e){ghSetToken('');ghStatus();alert(ghErr(e));});
+});
+function b64(bytes){var s='',CH=0x8000;for(var i=0;i<bytes.length;i+=CH)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));return btoa(s);}
+function fileBytes(f){  // 1MB 넘는 jpg는 가로·세로 1600px 이하로 줄여서 올림
+  var big=f.size>1024*1024&&/jpe?g$/i.test(f.name);
+  if(!big)return f.arrayBuffer().then(function(b){return new Uint8Array(b);});
+  return new Promise(function(res){var img=new Image(),u=URL.createObjectURL(f);img.onload=function(){
+      var k=Math.min(1,1600/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);c.toBlob(function(b){URL.revokeObjectURL(u);b.arrayBuffer().then(function(a){res(new Uint8Array(a));});},'image/jpeg',0.85);};
+    img.onerror=function(){f.arrayBuffer().then(function(b){res(new Uint8Array(b));});};img.src=u;});
+}
+var ghBusy=false;
+document.getElementById('ghup').addEventListener('click',function(){
+  if(!rows.length){alert('먼저 내용을 불러와 주세요.');return;}
+  if(!ghToken()){alert('먼저 [🔑 GitHub 연결]을 눌러 토큰을 넣어 주세요.\n(토큰이 없으면 [💾 엑셀 내려받기]로 올리면 돼요)');return;}
+  var errs=validate();if(errs.length){alert('고쳐야 할 곳이 '+errs.length+'개 있어요. 빨간 상자 내용을 먼저 고쳐 주세요.');return;}
+  if(ghBusy)return;
+  var ph=newPhotos();
+  if(!confirm(P.name+' 페이지를 홈페이지에 올릴까요?\n\n· 엑셀: '+P.xlsx+(ph.length?'\n· 새 사진 '+ph.length+'장: '+ph.map(function(x){return x.name;}).join(', '):'')+'\n\n올리면 1~2분 뒤 홈페이지가 바뀌어요.'))return;
+  ghBusy=true;var btn=document.getElementById('ghup');btn.disabled=true;btn.textContent='⏳ 올리는 중…';
+  var items=[{path:P.xlsx,bytes:xlsxBytes()}];
+  Promise.all(ph.map(function(x){return fileBytes(x.file).then(function(b){return {path:P.img+x.name,bytes:b};});})).then(function(pics){
+    items=items.concat(pics);
+    function attempt(n){
+      var base;
+      return gh('GET','/git/ref/heads/'+GH_BRANCH).then(function(ref){base=ref.object.sha;return gh('GET','/git/commits/'+base);})
+        .then(function(c){return Promise.all(items.map(function(it){return gh('POST','/git/blobs',{content:b64(it.bytes),encoding:'base64'}).then(function(b){return {path:it.path,mode:'100644',type:'blob',sha:b.sha};});}))
+          .then(function(tree){return gh('POST','/git/trees',{base_tree:c.tree.sha,tree:tree});});})
+        .then(function(tr){return gh('POST','/git/commits',{message:'편집기: '+P.name+' 수정'+(pics.length?' (사진 '+pics.length+'장)':''),tree:tr.sha,parents:[base]});})
+        .then(function(cm){return gh('PATCH','/git/refs/heads/'+GH_BRANCH,{sha:cm.sha});})
+        .catch(function(e){if(n<2&&(e.status===422||e.status===409))return attempt(n+1);throw e;});
+    }
+    return attempt(0);
+  }).then(function(){
+    dirty=false;upFiles.clear();
+    toast('✅ 홈페이지에 올렸어요. 1~2분 뒤 반영돼요.<br><a href="https://github.com/'+GH_REPO+'/actions" target="_blank" style="color:#ffd8a8">진행 상황 보기 ›</a>',12000);
+  }).catch(function(e){alert(ghErr(e));})
+  .then(function(){ghBusy=false;btn.disabled=false;btn.textContent='⬆ 홈페이지에 바로 올리기';});
+});
+ghStatus();
 
 setPage(QS.get('page')&&PAGES[QS.get('page')]?QS.get('page'):'volunteer');
 </script>

@@ -187,17 +187,16 @@
     html+='</div>';
     if(!open && a.신청기간아닐때_문구) html+='<div class="note" data-k="신청기간아닐때_문구">'+esc(a.신청기간아닐때_문구)+'</div>';
 
-    // 이용 절차 (고정)
-    var proc=['복지관 회원 가입','수강 신청(방문)','선정 여부 확인','프로그램 참여'];
-    html+='<div class="subh">이용 절차</div><div class="proc">'
+    // 이용 절차 · 수강료 · 유의사항 — 엑셀 '신청안내' 시트(비어 있으면 기본 문구)
+    function lines(v){ return String(v||'').split(/\n/).map(function(x){return x.replace(/^\s*[·•\-\*]\s*/,'').trim();}).filter(Boolean); }
+    var proc=lines(a.이용절차); if(!proc.length) proc=['복지관 회원 가입','수강 신청(방문)','선정 여부 확인','프로그램 참여'];
+    html+='<div class="subh">이용 절차</div><div class="proc" data-k="이용절차">'
       + proc.map(function(s,i){ return (i?'<span class="ar">›</span>':'')+'<span class="p">'+esc(s)+'</span>'; }).join('')
       + '</div>';
 
-    // 수강료 (고정)
-    html+='<div class="subh">수강료</div><div class="fee">수강료 무료(일부 유료) · 교재비·재료비는 별도(본인 부담)</div>';
+    html+='<div class="subh">수강료</div><div class="fee" data-k="수강료안내">'+esc(a.수강료안내||'수강료 무료(일부 유료) · 교재비·재료비는 별도(본인 부담)')+'</div>';
 
-    // 유의사항 (기관 고정 규칙)
-    var rules=[
+    var rules=lines(a.유의사항); if(!rules.length) rules=[
       '수강 신청 시 회원증을 반드시 지참하세요.',
       '1인당 최대 3과목까지 신청할 수 있습니다.',
       '신청자가 정원을 넘으면 추첨으로 선정하며, 미선정자는 대기번호가 부여되어 잔여석 발생 시 순번대로 안내합니다.',
@@ -206,7 +205,7 @@
       '수강 신청 인원이 정원의 60% 미만이면 부득이하게 폐강될 수 있습니다.',
       '법정공휴일에는 프로그램이 휴강됩니다.'
     ];
-    html+='<div class="subh">유의사항</div><ul class="rules">'
+    html+='<div class="subh">유의사항</div><ul class="rules" data-k="유의사항">'
       + rules.map(function(r){ return '<li>'+esc(r)+'</li>'; }).join('')
       + '</ul>';
 
@@ -346,8 +345,11 @@
   window.addEventListener('hashchange',route);
 
   // 편집기 규약: render(데이터) + BW_LOAD 마커 + window.__bwHi(미리보기 강조)
+  function todayStr(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
   function render(j){
-    DATA=j; DATA.프로그램=DATA.프로그램||[]; if(!curCat) curCat=CATS[0];
+    DATA=j; var T=todayStr();
+    // 운영종료 날짜가 지난 프로그램은 자동으로 숨김 (종료일 당일까지는 보임)
+    DATA.프로그램=(DATA.프로그램||[]).filter(function(p){ return !p.운영종료 || p.운영종료>=T; }); if(!curCat) curCat=CATS[0];
     renderSeg(); applyTopView();
     renderApply(); renderTabs(); renderFilters(); renderList(); route();
   }

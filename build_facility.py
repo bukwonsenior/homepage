@@ -6,6 +6,7 @@
 - 층명이 같은 줄끼리 한 층으로 묶이고, 나온 순서대로 화면에 그려진다.
   층명 '1층'→ 배지 1F, '지하1층'/'B1층' → B1, 그 밖(예: 전경)은 그대로 배지.
 - 사진: img/facility/ 폴더의 파일명. 쉼표로 여러 장(최대 3). 확장자를 빼먹으면 .jpg로 본다.
+- 선택 시트 '기관정보'(항목|내용) → 시설안내 맨 위 기관 정보.
 - (예전 형식의 '층코드' 칸이 있으면 그 값을 층 구분에 그대로 쓴다)
 """
 import json, re, sys
@@ -73,8 +74,15 @@ def main():
         for e in errors: print("  ✗ " + e)
         print(f"::error::엑셀 오류 {len(errors)}건"); sys.exit(1)
     for w in warns: print("::warning::" + w)
+    info = []
+    if "기관정보" in wb.sheetnames:   # 선택 시트: 맨 위 기관 정보 (항목 | 내용)
+        wi = wb["기관정보"]
+        for r in range(5, wi.max_row + 1):
+            k, v = s(wi.cell(r, 1).value), s(wi.cell(r, 2).value)
+            if k or v: info.append({"항목": k, "내용": v})
     result = [floors[c] for c in order]
-    OUT.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
+    doc = {"기관정보": info, "층": result}
+    OUT.write_text(json.dumps(doc, ensure_ascii=False, indent=1), encoding="utf-8")
     print(f"✓ {OUT} 생성 — {len(result)}개 층, {sum(len(f['rooms']) for f in result)}개 실")
 
 if __name__ == "__main__":

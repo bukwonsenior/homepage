@@ -13,6 +13,7 @@ body{font-family:'Malgun Gothic','Noto Sans KR',sans-serif;background:#fff;color
 .facility-info h2{font-size:clamp(19.1px,calc(17.75px + 0.349vw),21.6px);font-weight:800;color:#222;margin-bottom:8px;padding-bottom:8px;border-bottom:3px solid #EA580C;display:inline-block;}
 .info-list{font-size:clamp(13.8px,calc(12.82px + 0.252vw),15.6px);color:#555;line-height:2;}
 .info-list .lbl{color:#888;}
+.info-list .ii{border-radius:6px;}
 
 /* 층 + 실 버튼 영역 */
 .floor-nav{padding:8px 20px 12px;border-bottom:1px solid #eee;}
@@ -106,7 +107,7 @@ body{font-family:'Malgun Gothic','Noto Sans KR',sans-serif;background:#fff;color
 
 <div class="facility-info">
   <h2>시설안내</h2>
-  <div class="info-list">
+  <div class="info-list" id="info-list">
     <span class="lbl">기관명 :</span> 북원노인종합복지관<br>
     <span class="lbl">운영법인 :</span> 사회복지법인 밥상공동체복지재단<br>
     <span class="lbl">설치신고 :</span> 2023. 5. 23.<br>
@@ -135,8 +136,16 @@ var curPhotos = [], curPhotoIdx = 0;
 function hasPhotos(rm){return rm.photos && rm.photos.length>0;}
 
 // 편집기 규약: render(데이터) + BW_LOAD 마커 + window.__bwHi(미리보기 강조)
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function renderInfo(list){   // 엑셀 '기관정보' 시트 → 맨 위 기관 정보 (없으면 기본 문구 그대로)
+  if(!list||!list.length) return;
+  document.getElementById('info-list').innerHTML=list.map(function(x,i){
+    return '<div class="ii" data-i="'+i+'"><span class="lbl">'+esc(x.항목)+' :</span> '+esc(x.내용)+'</div>';
+  }).join('');
+}
 function render(data){
-  FLOORS = Array.isArray(data) ? data : [];
+  FLOORS = Array.isArray(data) ? data : ((data&&data.층)||[]);
+  renderInfo(data&&data.기관정보);
   renderNav();
   for(var fi=0;fi<FLOORS.length;fi++){
     for(var ri=0;ri<FLOORS[fi].rooms.length;ri++){
@@ -146,6 +155,10 @@ function render(data){
   if(FLOORS.length&&FLOORS[0].rooms.length) sel(0,0);
 }
 window.__bwHi=function(m){
+  if(m.key&&m.key.indexOf('i:')===0){
+    var el=document.querySelector('#info-list .ii[data-i="'+m.key.slice(2)+'"]')||document.querySelector('.facility-info');
+    if(el){ el.classList.add('bwhi'); el.scrollIntoView({block:'center'}); } return true;
+  }
   if(m.tab==null||m.tab<0||!FLOORS[m.tab]) return false;
   var ri=Math.min(m.pos||0,FLOORS[m.tab].rooms.length-1); if(ri<0) return false;
   sel(m.tab,ri);
