@@ -129,7 +129,9 @@ tr.dragging{opacity:.35;} tr.over td{box-shadow:inset 0 3px 0 var(--brand);}
 <script>
 /* ================= 공통 ================= */
 var QS=new URLSearchParams(location.search);
-var RAW=QS.get('base')||'https://raw.githubusercontent.com/bukwonsenior/homepage/main/';   // 페이지 틀·엑셀
+var RAW=QS.get('base')||'https://raw.githubusercontent.com/bukwonsenior/homepage/main/';
+function repoName(){return QS.get('repo')||(P&&P.repo)||'bukwonsenior/homepage';}
+function rawBase(){return QS.get('base')||(P&&P.repo?'https://raw.githubusercontent.com/'+P.repo+'/main/':RAW);}   // 페이지 틀·엑셀
 var LIVE=QS.get('live')||'https://bukwonsenior.github.io/homepage/';                    // 이미 올라간 사진
 var ICONS={"phone": "<path d=\"M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012 4.2 2 2 0 014 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8 9.6a16 16 0 006 6l1.2-1.1a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6A2 2 0 0122 16.9z\"/>", "home": "<path d=\"M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5\"/>", "meal": "<path d=\"M3 11h18M5 11V8a7 7 0 0114 0v3M4 11v6a3 3 0 003 3h10a3 3 0 003-3v-6\"/>", "talk": "<path d=\"M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z\"/>", "user": "<circle cx=\"12\" cy=\"8\" r=\"4\"/><path d=\"M4 21c0-4 4-6 8-6s8 2 8 6\"/>", "users": "<circle cx=\"9\" cy=\"8\" r=\"3.5\"/><path d=\"M2 21c0-3.5 3-5.5 7-5.5s7 2 7 5.5\"/><path d=\"M16 5a3.5 3.5 0 010 6M22 21c0-3-1.5-4.8-4-5.3\"/>", "clean": "<path d=\"M21 3L11 13\"/><path d=\"M14.5 9.5l-8.5 8.5 3 3 8.5-8.5z\"/><path d=\"M4 21l2-2M8 17l2 2\"/>", "music": "<path d=\"M9 18V5l12-2v13M9 9l12-2\"/><circle cx=\"6\" cy=\"18\" r=\"3\"/><circle cx=\"18\" cy=\"16\" r=\"3\"/>", "health": "<path d=\"M22 12h-4l-3 9L9 3l-3 9H2\"/>", "pill": "<path d=\"M10.5 3.5a5 5 0 017 7l-6 6a5 5 0 01-7-7z\"/><path d=\"M8 8l8 8\"/>", "walk": "<circle cx=\"13\" cy=\"4\" r=\"2\"/><path d=\"M11 21l2-6-3-2 1-5 3 2 2 2M9 21l2-6\"/>", "shield": "<path d=\"M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z\"/>", "star": "<path d=\"M12 2l2.4 7.4H22l-6 4.6 2.3 7.4L12 17l-6.3 4.4L8 14 2 9.4h7.6z\"/>", "heart": "<path d=\"M20.8 5.6a5.5 5.5 0 00-7.8 0L12 6.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 21l7.8-6.6 1-1a5.5 5.5 0 000-7.8z\"/>", "hand": "<path d=\"M11 13V5a1.5 1.5 0 013 0v6M14 11V4a1.5 1.5 0 013 0v8M8 13V7a1.5 1.5 0 013 0v4M17 8a1.5 1.5 0 013 0v6a7 7 0 01-7 7h-1a7 7 0 01-6-3.5L5 15\"/>", "gift": "<path d=\"M20 12v9H4v-9M2 7h20v5H2zM12 22V7M12 7a3 3 0 10-3-3c0 2 3 3 3 3zM12 7a3 3 0 013-3c0 2-3 3-3 3z\"/>", "bread": "<path d=\"M4 3h16v4H4zM6 7v14h12V7M9 11h6\"/>", "coffee": "<path d=\"M4 8h13v5a5 5 0 01-5 5H9a5 5 0 01-5-5zM17 9h2a2 2 0 010 4h-2M6 3v2M10 3v2M14 3v2\"/>", "mic": "<path d=\"M12 2a3 3 0 013 3v6a3 3 0 01-6 0V5a3 3 0 013-3zM5 11a7 7 0 0014 0M12 18v3\"/>", "mega": "<path d=\"M3 11v2a1 1 0 001 1h2l4 4V6L6 10H4a1 1 0 00-1 1zM15 8a5 5 0 010 8\"/>", "bell": "<path d=\"M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 01-3.4 0\"/>", "mail": "<rect x=\"3\" y=\"5\" width=\"18\" height=\"14\" rx=\"2\"/><path d=\"M3 7l9 6 9-6\"/>", "book": "<path d=\"M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM19 3v16\"/>", "edit": "<path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z\"/>", "camera": "<path d=\"M3 8a2 2 0 012-2h2l2-2h6l2 2h2a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2z\"/><circle cx=\"12\" cy=\"13\" r=\"3.5\"/>", "calendar": "<rect x=\"3\" y=\"4\" width=\"18\" height=\"18\" rx=\"2\"/><path d=\"M16 2v4M8 2v4M3 10h18\"/>", "clock": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M12 7v5l3 2\"/>", "car": "<path d=\"M5 13l1.5-4.5A2 2 0 018.4 7h7.2a2 2 0 011.9 1.5L19 13M5 13h14v5H5zM5 18v2M19 18v2\"/><circle cx=\"7.5\" cy=\"15.5\" r=\"1\"/><circle cx=\"16.5\" cy=\"15.5\" r=\"1\"/>", "bus": "<rect x=\"4\" y=\"4\" width=\"16\" height=\"13\" rx=\"2\"/><path d=\"M4 11h16M8 17v2M16 17v2\"/><circle cx=\"8\" cy=\"14\" r=\"1\"/><circle cx=\"16\" cy=\"14\" r=\"1\"/>", "mappin": "<path d=\"M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 1116 0z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/>", "leaf": "<path d=\"M11 20A7 7 0 014 13c0-6 8-9 16-9 0 8-3 16-9 16z\"/><path d=\"M4 20c4-4 8-6 12-7\"/>", "flower": "<circle cx=\"12\" cy=\"12\" r=\"2.5\"/><path d=\"M12 9.5c0-3 4-4 4-1s-4 1-4 1zM12 14.5c0 3-4 4-4 1s4-1 4-1zM9.5 12c-3 0-4-4-1-4s1 4 1 4zM14.5 12c3 0 4 4 1 4s-1-4-1-4z\"/>", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19\"/>", "smile": "<circle cx=\"12\" cy=\"12\" r=\"9\"/><path d=\"M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01\"/>", "scissors": "<circle cx=\"6\" cy=\"6\" r=\"2.5\"/><circle cx=\"6\" cy=\"18\" r=\"2.5\"/><path d=\"M8 8l12 10M8 16L20 6\"/>", "wrench": "<path d=\"M21 4a5 5 0 01-6.5 6.5L5 20l-2-2 9.5-9.5A5 5 0 0121 4z\"/>", "bank": "<path d=\"M3 21h18M4 21V10M20 21V10M4 10l8-6 8 6M9 21v-6h6v6\"/>", "card": "<rect x=\"2\" y=\"5\" width=\"20\" height=\"14\" rx=\"2\"/><path d=\"M2 10h20\"/>", "box": "<path d=\"M21 8l-9-5-9 5 9 5 9-5zM3 8v8l9 5 9-5V8M12 13v8\"/>", "link": "<path d=\"M10 13a5 5 0 007 0l3-3a5 5 0 00-7-7l-1 1M14 11a5 5 0 00-7 0l-3 3a5 5 0 007 7l1-1\"/>", "receipt": "<path d=\"M5 3v18l2-1 2 1 2-1 2 1 2-1 2 1V3l-2 1-2-1-2 1-2-1-2 1z\"/><path d=\"M9 8h6M9 12h6\"/>", "pin": "<path d=\"M12 21s-6-5.3-6-10a6 6 0 0112 0c0 4.7-6 10-6 10z\"/><circle cx=\"12\" cy=\"11\" r=\"2.2\"/>", "route": "<circle cx=\"6\" cy=\"19\" r=\"3\"/><circle cx=\"18\" cy=\"5\" r=\"3\"/><path d=\"M9 19h6a3 3 0 003-3V8\"/>", "check": "<path d=\"M20 6L9 17l-5-5\"/>"};
 var ICON_KO={phone:'전화',home:'방문',meal:'식사',talk:'상담',user:'사람',users:'모임',clean:'청소',music:'음악',health:'건강',pill:'약',walk:'걷기',shield:'방역',star:'별',heart:'하트',hand:'손',gift:'선물',bread:'빵',coffee:'차',mic:'방송',mega:'홍보',bell:'알림',mail:'편지',book:'책',edit:'신청',camera:'사진',calendar:'달력',clock:'시간',car:'차량',bus:'버스',mappin:'위치',pin:'장소',route:'경로',leaf:'잎',flower:'꽃',sun:'해',smile:'미소',scissors:'이미용',wrench:'수리',bank:'은행',card:'카드',box:'물품',link:'연결',receipt:'영수증',check:'체크'};
@@ -419,6 +421,118 @@ PAGES.programs=page({
   }
 });
 
+/* ---- 후원지도 (저장소 bukwon-sponsors-map): 한 줄 = 가게, 업종 = 탭. 좌표는 올린 뒤 GitHub가 자동으로 찾아 엑셀에도 채움 ---- */
+var geoReport=null;
+PAGES.sponsors=page({
+  group:'봉사·후원', name:'후원지도', crumb:'봉사·후원 › 우리동네 후원지도', repo:'bukwonsenior/bukwon-sponsors-map', html:'index.html', xlsx:'북원_후원업체_지도관리.xlsx', sheet:'후원처',
+  nslots:14, map:[['게시',0],['상호명',3],['업종',1],['주소',4],['전화',5],['위도',10],['경도',11],['비고',9],['후원내용',12],['소개',13]],
+  headKey:'상호명', fixedKind:'업체', tabWord:'업종', privacy:false,
+  tab:[{k:'업체',label:'후원 가게',form:1,req:3,hi:'.list-item',hiKey:function(r){return 'n:'+r[3];},
+    tip:'위도·경도는 비워 두세요 → 올리면 1~2분 안에 주소(안 되면 "원주 + 상호명")로 위치를 찾아 채워요 · 주소를 고치면 좌표는 자동으로 지워지고 다시 찾아요',
+    cols:[{c:3,h:'상호명',w:2},{c:4,h:'주소',w:2},{c:5,h:'전화'},{c:12,h:'후원내용'},{c:10,h:'위도 (비우면 자동)'},{c:11,h:'경도 (비우면 자동)'},{c:13,h:'소개',w:2,ta:1},{c:9,h:'비고 (소개가 없을 때 대신 보임)',w:2}]}],
+  onEdit:function(r,c){ if(c===4&&(r[10]||r[11])){r[10]='';r[11]='';toast('주소가 바뀌어 좌표를 지웠어요. 올리면 새 주소로 다시 찾아요.');return true;} return false; },
+  afterLoad:function(){ geoReport=null; fetch(rawBase()+'_geocode_report.json?t='+Date.now()).then(function(r){return r.ok?r.json():null;}).then(function(j){geoReport=j;validate();}).catch(function(){}); },
+  validateRow:function(r,ln,errs,warns){
+    var la=r[10],lo=r[11];
+    if((la&&!lo)||(!la&&lo))errs.push(ln+': 위도·경도는 둘 다 넣거나 둘 다 비워 주세요');
+    else if(la&&(isNaN(parseFloat(la))||isNaN(parseFloat(lo))||parseFloat(la)<33||parseFloat(la)>39||parseFloat(lo)<124||parseFloat(lo)>132))errs.push(ln+': 위도·경도 숫자가 이상해요 (예: 37.38 / 127.95)');
+    if(isX(r)||!geoReport)return;
+    (geoReport.좌표못찾음||[]).forEach(function(g){if(g.상호명===r[3]&&!la)warns.push(ln+': '+esc(r[3])+' — 지난번 올릴 때 주소로 위치를 못 찾아 지도에서 빠져 있어요. 주소를 정확히 고치거나 위도·경도를 직접 넣어 주세요');});
+    (geoReport.새로찾음||[]).forEach(function(g){if(g.상호명===r[3]&&/keyword:원주 /.test(g.방법||''))warns.push(ln+': '+esc(r[3])+' — 주소로 못 찾아 가게 이름으로 위치를 찾았어요. 홈페이지 지도에서 맞는 곳인지 한 번 봐 주세요');});
+  },
+  guide:['■ 한 줄 = 후원 가게 하나. 위도·경도는 비우면 자동으로 채워집니다.','■ 게시: O=보임 / X=숨김'],
+  build:function(rows){
+    var arr=[['연번','상호명','업종','주소','전화','위도','경도','비고','후원내용','소개']],n=0;
+    rows.forEach(function(r){if(isX(r)||!r[3])return;arr.push([++n,r[3],r[1],r[4],r[5],r[10],r[11],r[9],r[12],r[13]]);});
+    arr.탭=tabNames().map(function(c){return {이름:c};});return arr;
+  }
+});
+
+/* ---- 셔틀버스 (저장소 bw_bus_routes): 코스 = 탭, 한 줄 = 정차(정류장명·시각). 정류장 목록은 아래쪽. 정류장번호만 넣으면 좌표 자동 ---- */
+// 행 칸: 0게시 1코스 2종류(코스정보/정차/정류장) 3정류장명 4시각 5설명 7번호 8정류장번호 9위도 10경도 11주소 12비고 13좌표확인 14색상
+var BISMAP=null, BUS_ID={'오전 1코스':'am1','오전 2코스':'am2','오후 코스':'pm'}, BUS_COLORS=['#E8442E','#1F6FEB','#1D8348','#8E44AD','#D35400','#16A085'];
+function busStops(){return rows.filter(function(r){return r[2]==='정류장'&&r[3];});}
+function busPos(r){var la=parseFloat(r[9]),lo=parseFloat(r[10]);if(r[9]!==''&&r[10]!==''&&!isNaN(la)&&!isNaN(lo))return [la,lo];var b=BISMAP&&r[8]&&BISMAP[String(r[8]).trim()];return b||null;}
+function busMin(t){var m=/^(\d{2}):(\d{2})$/.exec(t);return m?(+m[1])*60+(+m[2]):null;}
+PAGES.bus=page({
+  group:'기관소개', name:'셔틀버스', crumb:'기관소개 › 셔틀버스 운행 노선', repo:'bukwonsenior/bw_bus_routes', html:'index.html', xlsx:'셔틀버스_노선관리.xlsx', sheet:'코스',
+  nslots:15, tabWord:'코스', newTabKind:'코스정보', privacy:false,
+  tab:[
+    {k:'코스정보',label:'코스 정보 (탭 아래 설명·색)',single:1,cols:[{c:5,h:'설명 (예: 태장·소초 방면 (등원))'},{c:14,h:'색상 (#E8442E)'}],hiKey:function(r){return 'c:'+r[1]+':info';}},
+    {k:'정차',label:'정차 순서 (위에서부터)',req:3,cols:[{c:3,h:'정류장명',opts:function(){return [''].concat(busStops().map(function(s){return s[3];}));}},{c:4,h:'도착 시각 (07:50)'}],
+      hiKey:function(r){return 'c:'+r[1]+':'+rows.filter(function(x){return x[1]===r[1]&&x[2]==='정차'&&!isX(x);}).indexOf(r);},
+      tip:'줄을 끌어 순서를 바꿀 수 있어요 · 정류장명은 아래 "정류장 목록"에 있는 이름에서 골라요 · 시각이 앞 정류장보다 빠르면 올릴 수 없어요'}
+  ],
+  top:[{k:'정류장',label:'정류장 목록 (모든 코스 공통)',bottom:1,form:1,noPub:1,
+    cols:[{c:3,h:'정류장명',w:2},{c:8,h:'정류장번호 (5자리)'},{c:7,h:'번호 (비우면 자동)'},{c:9,h:'위도 (번호 있으면 비워도 됨)'},{c:10,h:'경도'},{c:11,h:'주소',w:2},{c:12,h:'비고',w:2}],
+    hiKey:function(r){return 's:'+r[3];},
+    tip:'버스정류장 표지판의 정류장번호(5자리)를 넣으면 위치가 자동으로 잡혀요. 번호가 없는 곳(복지관·아파트 정문 등)은 위도·경도를 직접 넣어 주세요.'}],
+  afterLoad:function(){
+    if(BISMAP)return;
+    fetch(rawBase()+encodeURIComponent('원주시_버스정류장_좌표.csv')).then(function(r){return r.ok?r.text():'';}).then(function(t){
+      var m={};t.replace(/^﻿/,'').split(/\r?\n/).slice(1).forEach(function(l){var c=l.split(',');if(c.length>=5&&c[4]&&c[4]!=='0')m[c[4].trim()]=[parseFloat(c[2]),parseFloat(c[3])];});
+      BISMAP=m;render(true);
+    }).catch(function(){});
+  },
+  readWB:function(wb){
+    var out=[];function sh(n){var ws=wb.Sheets[n];if(!ws)throw '\''+n+'\' 시트가 없어요';return XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true});}
+    function blank(){var r=[];for(var i=0;i<15;i++)r.push('');return r;}
+    var a=sh('코스'),H=(a[3]||[]).map(function(x){return String(x).trim();}),ix=function(h){return H.indexOf(h);};
+    if(ix('정류장명')<0)throw '코스 시트 4행에 머리글이 없어요';
+    for(var i=4;i<a.length;i++){var row=a[i];if(!row.some(function(c){return String(c).trim();}))continue;var r=blank();
+      r[0]=String(row[ix('게시')]||'O').trim()||'O';r[1]=String(row[ix('코스')]).trim();r[2]=String(row[ix('종류')]).trim();
+      r[3]=String(row[ix('정류장명')]).trim();r[4]=pgCell(row[ix('시각')],'time');r[5]=String(row[ix('설명')]).trim();r[14]=String(row[ix('색상')]).trim();out.push(r);}
+    var b=sh('정류장'),G=(b[3]||[]).map(function(x){return String(x).trim();}),gx=function(h){return G.indexOf(h);};
+    for(i=4;i<b.length;i++){var w=b[i];if(!w.some(function(c){return String(c).trim();}))continue;var r=blank();
+      r[0]='O';r[2]='정류장';r[3]=String(w[gx('정류장명')]).trim();r[7]=String(w[gx('번호')]).trim();r[8]=String(w[gx('정류장번호')]).trim();
+      r[9]=String(w[gx('위도')]).trim();r[10]=String(w[gx('경도')]).trim();r[11]=String(w[gx('주소')]).trim();r[12]=String(w[gx('비고')]).trim();r[13]=gx('좌표확인')>=0?String(w[gx('좌표확인')]).trim():'';out.push(r);}
+    return out;
+  },
+  writeWB:function(rows,orig){
+    var wb=XLSX.utils.book_new();
+    function head(n,def){var ws=orig&&orig.Sheets[n];var a=ws?XLSX.utils.sheet_to_json(ws,{header:1,defval:''}).slice(0,4):[];while(a.length<4)a.push([]);a[3]=def;return a;}
+    function num(v){return v!==''&&!isNaN(v)?+v:v;}
+    if(orig&&orig.Sheets['사용법'])XLSX.utils.book_append_sheet(wb,orig.Sheets['사용법'],'사용법');
+    var A=head('코스',['게시','코스','종류','정류장명','시각','설명','색상']).concat(rows.filter(function(r){return r[2]==='코스정보'||r[2]==='정차';}).map(function(r){
+      return r[2]==='정차'?[r[0],r[1],'정차',r[3],r[4],'','']:[r[0],r[1],'코스정보','','',r[5],r[14]];}));
+    var ws=XLSX.utils.aoa_to_sheet(A);ws['!cols']=[7,14,10,22,9,26,11].map(function(w){return{wch:w};});XLSX.utils.book_append_sheet(wb,ws,'코스');
+    var S=head('정류장',['번호','정류장명','정류장번호','위도','경도','주소','비고','좌표확인']).concat(rows.filter(function(r){return r[2]==='정류장';}).map(function(r){
+      return [num(r[7]),r[3],r[8],num(r[9]),num(r[10]),r[11],r[12],r[13]];}));
+    ws=XLSX.utils.aoa_to_sheet(S);ws['!cols']=[7,22,11,12,12,30,30,11].map(function(w){return{wch:w};});XLSX.utils.book_append_sheet(wb,ws,'정류장');
+    return wb;
+  },
+  lineOf:function(r,i){var sh=r[2]==='정류장'?'정류장':'코스',n=0;for(var j=0;j<i;j++)if((rows[j][2]==='정류장')===(r[2]==='정류장'))n++;return sh+' 시트 '+(n+5)+'행';},
+  validateRow:function(r,ln,errs,warns){
+    if(r[2]==='정류장'){
+      if(!r[3]){errs.push(ln+': 정류장명이 비어 있어요');return;}
+      if(busStops().filter(function(x){return x[3]===r[3];}).length>1)errs.push(ln+': "'+esc(r[3])+'" 이름이 정류장 목록에 두 번 있어요');
+      if(!busPos(r))errs.push(ln+': '+esc(r[3])+' 위치를 몰라요 → 정류장번호(5자리)를 넣거나 위도·경도를 직접 넣어 주세요'+(r[8]&&BISMAP?' (정류장번호 '+esc(r[8])+'는 원주시 목록에 없어요)':''));
+      return;
+    }
+    if(isX(r))return;
+    if(r[2]==='코스정보'){if(r[14]&&!/^#[0-9A-Fa-f]{6}$/.test(r[14]))errs.push(ln+': 색상은 #E8442E 처럼 써 주세요');return;}
+    if(r[2]!=='정차')return;
+    if(r[3]&&!busStops().some(function(x){return x[3]===r[3];}))errs.push(ln+': 정류장 "'+esc(r[3])+'"이(가) 정류장 목록에 없어요');
+    if(busMin(r[4])===null){errs.push(ln+': 시각은 07:50 처럼 써 주세요 (지금: "'+esc(r[4])+'")');return;}
+    var prev=null;for(var j=rows.indexOf(r)-1;j>=0;j--){var x=rows[j];if(x[1]===r[1]&&x[2]==='정차'&&!isX(x)){prev=x;break;}}
+    if(prev&&busMin(prev[4])!==null&&busMin(r[4])<busMin(prev[4]))errs.push(ln+': '+esc(r[3])+' '+r[4]+'이(가) 앞 정류장('+esc(prev[3])+' '+prev[4]+')보다 빨라요 (시간 역행)');
+  },
+  build:function(rows){
+    var stops=[],byName={},maxId=0;
+    busStops().forEach(function(r){var n=parseInt(r[7]);if(!isNaN(n))maxId=Math.max(maxId,n);});
+    busStops().forEach(function(r){var p=busPos(r);if(!p||byName[r[3]])return;var id=parseInt(r[7]);if(isNaN(id))id=++maxId;
+      var st={id:id,name:r[3],lat:p[0],lng:p[1],bis:r[8],addr:r[11],conf:r[13]||'confirmed',note:r[12]};stops.push(st);byName[r[3]]=st;});
+    var routes=[],rm={};
+    rows.forEach(function(r){if(isX(r)||!r[1]||(r[2]!=='코스정보'&&r[2]!=='정차'))return;
+      if(!rm[r[1]]){rm[r[1]]={id:BUS_ID[r[1]]||('c'+(routes.length+1)),name:r[1],sub:'',color:BUS_COLORS[routes.length%BUS_COLORS.length],stops:[]};routes.push(rm[r[1]]);}
+      var R=rm[r[1]];
+      if(r[2]==='코스정보'){R.sub=r[5];if(/^#[0-9A-Fa-f]{6}$/.test(r[14]))R.color=r[14].toUpperCase();}
+      else{var st=byName[r[3]];if(st&&busMin(r[4])!==null)R.stops.push({seq:R.stops.length+1,id:st.id,name:st.name,time:r[4],lat:st.lat,lng:st.lng,bis:st.bis});}
+    });
+    return {stops:stops,routes:routes,탭:routes.map(function(x){return {이름:x.name};})};
+  }
+});
+
 /* ================= 상태 ================= */
 var P=null,pageKey=null,rows=[],tpl=null,tplOld=false,dev='pc',curTab='',lastHi=null,dirty=false;
 var blobs=new Map(), fblobs=new Map(), upFiles=new Map(), heights=[], renderTimer=null, lastDoc=null;
@@ -457,7 +571,7 @@ function setPage(k){
 }
 function loadTemplate(){
   var want=pageKey;
-  fetch(RAW+P.html+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(t){
+  fetch(rawBase()+P.html+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(t){
     if(want!==pageKey)return;
     tplOld=!/tabpanel|__bwHi/.test(t)||(!!P.img&&P.imgVar!==false&&!/var IMG_BASE=/.test(t));
     var LOAD="setTimeout(function(){try{render(window.__BW__||{});}catch(e){document.getElementById('app').innerHTML='<div class=\"none\">미리보기 오류: '+e.message+'</div>';}},0);";
@@ -474,7 +588,7 @@ var origWB=null;
 function readWorkbook(buf,from){
   var wb=XLSX.read(new Uint8Array(buf),{type:'array'});
   if(P.readWB){try{rows=P.readWB(wb);}catch(e){alert('엑셀을 읽지 못했어요: '+e+'\n'+P.name+' 페이지 엑셀이 맞는지 확인해 주세요.');return;}
-    origWB=wb;blobs.clear();dirty=false;curTab=tabNames()[0]||'';lastHi=null;buildEditor();render(true);toast('✅ '+from+' 불러왔어요 ('+rows.length+'줄)');return;}
+    origWB=wb;blobs.clear();dirty=false;curTab=tabNames()[0]||'';lastHi=null;if(P.afterLoad)P.afterLoad();buildEditor();render(true);toast('✅ '+from+' 불러왔어요 ('+rows.length+'줄)');return;}
   var ws=wb.Sheets[P.sheet]||wb.Sheets[wb.SheetNames.filter(function(n){return n!=='사용법';})[0]];
   var aoa=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
   var hi=aoa.findIndex(function(r){var m=r.map(function(x){return String(x).trim();});return m.indexOf(P.headKey)>=0&&m.indexOf('게시')>=0;});
@@ -491,13 +605,14 @@ function readWorkbook(buf,from){
     if(old&&P.migrate[r[2]]){r[1]=P.migrate[r[2]][0];r[2]=P.migrate[r[2]][1];}
     out.push(r);
   }
-  rows=out;blobs.clear();dirty=false;curTab=tabNames()[0]||'';lastHi=null;
+  rows=out;origWB=wb;blobs.clear();dirty=false;curTab=tabNames()[0]||'';lastHi=null;
+  if(P.afterLoad)P.afterLoad();
   buildEditor();render(true);
   toast('✅ '+from+' 불러왔어요 ('+rows.length+'줄)'+(old?'<br>옛날 형식이라 새 형식(탭 칸 포함)으로 바꿔서 열었어요.':''));
 }
 document.getElementById('loadlive').addEventListener('click',function(){
   if(dirty&&!confirm('수정 중인 내용이 사라져요. 홈페이지 내용을 다시 불러올까요?'))return;
-  fetch(RAW+P.xlsx.split('/').map(encodeURIComponent).join('/')+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();})
+  fetch(rawBase()+P.xlsx.split('/').map(encodeURIComponent).join('/')+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.arrayBuffer();})
     .then(function(b){readWorkbook(b,'현재 홈페이지 내용을');})
     .catch(function(){alert('홈페이지 엑셀을 불러오지 못했어요. 인터넷을 확인하거나 [📂 내 엑셀 열기]를 이용해 주세요.');});
 });
@@ -545,7 +660,7 @@ function group(s,area,tab){
     });
     return h+'</div><div class="addrow"><label>📷 사진 추가<input type="file" accept="image/*" multiple onchange="addPhotos(this.files);this.value=\'\'"></label><span class="one">가로 4:3, 2MB 이하 jpg 권장 · 사진 파일은 GitHub <b>'+P.img+'</b>에 같은 이름으로 올려야 해요</span></div></div>';
   }
-  h+='<table><thead><tr><th class="c-h"></th><th class="c-g">'+(s.fixed?'':'게시')+'</th>';
+  h+='<table><thead><tr><th class="c-h"></th><th class="c-g">'+(s.fixed||s.noPub?'':'게시')+'</th>';
   if(s.form)h+='<th>'+s.label+' 정보</th>';else s.cols.forEach(function(col){h+=col.icon?'<th class="c-ic">아이콘</th>':'<th>'+col.h+'</th>';});
   h+='<th class="c-x"></th></tr></thead><tbody>';
   list.forEach(function(i){h+=rowHTML(s,i);});
@@ -559,7 +674,7 @@ function rowHTML(s,i){
   var r=rows[i],drag=!s.single&&!s.fixed;
   var h='<tr data-i="'+i+'"'+(isX(r)?' class="off"':'')+(drag?' ondragover="rowOver(event,'+i+')" ondragleave="this.classList.remove(\'over\')" ondrop="rowDrop(event,'+i+')"':'')+'>';
   h+=drag?'<td class="drag" draggable="true" ondragstart="rowStart(event,'+i+')" ondragend="rowEnd()" title="끌어서 순서 변경">⠿</td>':'<td></td>';
-  h+=s.fixed?'<td></td>':'<td><select onchange="upd('+i+',0,this.value,1)"><option'+(isX(r)?'':' selected')+'>O</option><option'+(isX(r)?' selected':'')+'>X</option></select></td>';
+  h+=(s.fixed||s.noPub)?'<td></td>':'<td><select onchange="upd('+i+',0,this.value,1)"><option'+(isX(r)?'':' selected')+'>O</option><option'+(isX(r)?' selected':'')+'>X</option></select></td>';
   if(s.form){h+='<td><div class="fgrid">'+s.cols.map(function(col){return '<label class="fl'+(col.w?' w2':'')+'"><span>'+col.h+'</span>'+fieldHTML(i,r,col)+'</label>';}).join('')+'</div></td>';}
   else s.cols.forEach(function(col){
     if(col.icon)h+='<td><button class="icbtn" onclick="openIcon('+i+',event)">'+(r[6]&&ICONS[r[6]]?svg(r[6]):'<span class="none">'+(s.k==='정보'?'자동':'선택')+'</span>')+'</button></td>';
@@ -572,13 +687,13 @@ function rowHTML(s,i){
 }
 function fieldHTML(i,r,col){
   var v=r[col.c]==null?'':r[col.c];
-  if(col.opts){var o=col.opts.slice();if(o.indexOf(v)<0)o.push(v);return '<select onchange="upd('+i+','+col.c+',this.value)">'+o.map(function(x){return '<option'+(x===v?' selected':'')+'>'+esc(x)+'</option>';}).join('')+'</select>';}
+  if(col.opts){var o=(typeof col.opts==='function'?col.opts():col.opts).slice();if(o.indexOf(v)<0)o.push(v);return '<select onchange="upd('+i+','+col.c+',this.value)">'+o.map(function(x){return '<option'+(x===v?' selected':'')+'>'+esc(x)+'</option>';}).join('')+'</select>';}
   if(col.ta)return '<textarea oninput="upd('+i+','+col.c+',this.value)">'+esc(v)+'</textarea>';
   return '<input value="'+esc(v)+'" oninput="upd('+i+','+col.c+',this.value)">';
 }
 
 /* ================= 행 조작 ================= */
-function upd(i,c,v,rebuild){rows[i][c]=v;mark();if(rebuild){buildEditor();render(true);}else render();}
+function upd(i,c,v,rebuild){rows[i][c]=v;if(P.onEdit&&P.onEdit(rows[i],c))rebuild=1;mark();if(rebuild){buildEditor();render(true);}else render();}
 function addRow(k,tab){
   var r=blank(tab,k), at=-1;
   rows.forEach(function(x,i){if(x[2]===k&&(x[1]||'')===(tab||''))at=i;});
@@ -758,7 +873,7 @@ function makeWB(){
     ['■ 종류'+(P.top.length?'(탭 비움): '+kindsOf('top').join(' · '):': ')+(P.top.length?'':kindsOf('tab').join(' · '))],
     P.top.length?['■ 종류(탭 있음): '+kindsOf('tab').join(' · ')]:['■ 모든 줄에 탭 이름이 필요합니다.'],
     ['■ 사진 파일은 GitHub '+P.img+' 폴더에 같은 이름으로 올립니다.'],['■ 아이콘: '+Object.keys(ICONS).join(' ')],['■ 게시: O=보임 / X=숨김']];
-  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(g),'사용법');XLSX.utils.book_append_sheet(wb,ws,P.sheet);
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,(origWB&&origWB.Sheets['사용법'])||XLSX.utils.aoa_to_sheet(g),'사용법');XLSX.utils.book_append_sheet(wb,ws,P.sheet);
   return wb;
 }
 function xlsxBytes(){return new Uint8Array(XLSX.write(makeWB(),{bookType:'xlsx',type:'array'}));}
@@ -780,17 +895,17 @@ document.getElementById('dl').addEventListener('click',function(){
 /* ================= GitHub에 바로 올리기 =================
    담당자 PC에 'GitHub 토큰'(이 저장소 Contents 읽기·쓰기 권한만)을 한 번 붙여넣어 두면,
    엑셀 + 새 사진을 커밋 1번으로 올린다 → GitHub Actions가 1~2분 안에 홈페이지에 반영. */
-var GH_API=QS.get('api')||'https://api.github.com', GH_REPO=QS.get('repo')||'bukwonsenior/homepage', GH_BRANCH='main';
+var GH_API=QS.get('api')||'https://api.github.com', GH_BRANCH='main';
 function ghToken(){try{return localStorage.getItem('bw_gh_token')||'';}catch(e){return '';}}
 function ghSetToken(v){try{if(v)localStorage.setItem('bw_gh_token',v);else localStorage.removeItem('bw_gh_token');}catch(e){}}
 function ghStatus(){var on=!!ghToken();document.getElementById('ghst').textContent=on?'연결됨':'관리자 설정';document.getElementById('ghset').classList.toggle('ok',on);document.getElementById('ghup').classList.toggle('off',!on);}
 function gh(method,path,body){
-  return fetch(GH_API+'/repos/'+GH_REPO+path,{method:method,headers:{'Authorization':'Bearer '+ghToken(),'Accept':'application/vnd.github+json','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined})
+  return fetch(GH_API+'/repos/'+repoName()+path,{method:method,headers:{'Authorization':'Bearer '+ghToken(),'Accept':'application/vnd.github+json','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined})
     .then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(!r.ok){var e=new Error((j&&j.message)||('HTTP '+r.status));e.status=r.status;throw e;}return j;});});
 }
 function ghErr(e){
   if(e.status===401)return '토큰이 맞지 않거나 기한이 지났어요. 관리자에게 다시 연결을 요청해 주세요 ([⚙ 관리자 설정]).';
-  if(e.status===403||e.status===404)return '이 토큰에 저장소 쓰기 권한이 없어요. 토큰 권한(Contents: Read and write, 저장소 '+GH_REPO+')을 확인해 주세요.';
+  if(e.status===403||e.status===404)return '이 토큰에 저장소 쓰기 권한이 없어요. 토큰 권한(Contents: Read and write, 저장소 '+repoName()+')을 확인해 주세요.';
   if(e.status===422||e.status===409)return '그사이 다른 사람이 먼저 올렸어요. 잠시 뒤 다시 눌러 주세요.';
   return '올리지 못했어요 ('+esc(e.message||e)+'). 인터넷 연결을 확인하거나 [엑셀 내려받기]로 올려 주세요.';
 }
@@ -802,7 +917,7 @@ document.getElementById('ghset').addEventListener('click',function(){
   ghSetToken(v);ghStatus();
   gh('GET','').then(function(j){
     if(j.permissions&&j.permissions.push===false)throw {status:403};
-    toast('✅ GitHub 연결 완료 ('+esc(j.full_name||GH_REPO)+')');
+    toast('✅ GitHub 연결 완료 ('+esc(j.full_name||repoName())+')');
   }).catch(function(e){ghSetToken('');ghStatus();alert(ghErr(e));});
 });
 function b64(bytes){var s='',CH=0x8000;for(var i=0;i<bytes.length;i+=CH)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));return btoa(s);}
@@ -838,7 +953,7 @@ document.getElementById('ghup').addEventListener('click',function(){
     return attempt(0);
   }).then(function(){
     dirty=false;upFiles.clear();
-    toast('✅ 홈페이지에 올렸어요. 1~2분 뒤 반영돼요.<br><a href="https://github.com/'+GH_REPO+'/actions" target="_blank" style="color:#ffd8a8">진행 상황 보기 ›</a>',12000);
+    toast('✅ 홈페이지에 올렸어요. 1~2분 뒤 반영돼요.<br><a href="https://github.com/'+repoName()+'/actions" target="_blank" style="color:#ffd8a8">진행 상황 보기 ›</a>',12000);
   }).catch(function(e){alert(ghErr(e));})
   .then(function(){ghBusy=false;btn.disabled=false;btn.textContent='⬆ 홈페이지에 올리기';});
 });
