@@ -1,269 +1,301 @@
-[
- {
-  "code": "exterior",
-  "badge": "전경",
-  "name": "전경",
-  "rooms": [
-   {
-    "name": "건물 전경",
-    "photos": [
-     "img/facility/9_1.jpg",
-     "img/facility/9_2.jpg"
-    ],
-    "role": "원주시 북부권역의 복지거점, 북원노인종합복지관 입니다.",
-    "usage": ""
-   }
-  ]
- },
- {
-  "code": "f1",
-  "badge": "1F",
-  "name": "1층",
-  "rooms": [
-   {
-    "name": "사무실",
-    "photos": [
-     "img/facility/1_1.jpg"
-    ],
-    "role": "복지관 행정 업무 및 이용자 접수·상담 창구",
-    "usage": "평일 09:00~18:00 방문"
-   },
-   {
-    "name": "물리치료실",
-    "photos": [
-     "img/facility/1_2.jpg"
-    ],
-    "role": "이용자의 건강증진을 목적으로 물리치료 및 재활 프로그램 운영",
-    "usage": "1~4층 키오스크를 통해 예약"
-   },
-   {
-    "name": "건강관리실",
-    "photos": [
-     "img/facility/1_4_1.jpg",
-     "img/facility/1_4_2.jpg",
-     "img/facility/1_4_3.jpg"
-    ],
-    "role": "체력증진을 위한 운동기기 및 프로그램 운영",
-    "usage": "이용 등록 후 자율 이용"
-   },
-   {
-    "name": "음악실",
-    "photos": [
-     "img/facility/1_5.jpg"
-    ],
-    "role": "음악(악기) 관련 프로그램 운영",
-    "usage": "수업 등록 후 이용"
-   },
-   {
-    "name": "상담실",
-    "photos": [
-     "img/facility/1_3.jpg"
-    ],
-    "role": "개별 상담 및 사례관리 면담 진행",
-    "usage": "복지관 상담 요청 시"
-   },
-   {
-    "name": "회의실",
-    "photos": [
-     "img/facility/1_9.jpg"
-    ],
-    "role": "복지관 업무 회의 및 내빈 방문 시 활용",
-    "usage": "-"
-   }
-  ]
- },
- {
-  "code": "f2",
-  "badge": "2F",
-  "name": "2층",
-  "rooms": [
-   {
-    "name": "온기식당",
-    "photos": [
-     "img/facility/2_1.jpg"
-    ],
-    "role": "어르신 중식 제공 및 경로식당 운영",
-    "usage": "복지관 이용 등록 후 키오스크 발권"
-   },
-   {
-    "name": "요리교실",
-    "photos": [
-     "img/facility/2_2.jpg"
-    ],
-    "role": "요리 실습, 봉사단 제과/제빵 프로그램 운영",
-    "usage": "-"
-   },
-   {
-    "name": "서예실",
-    "photos": [
-     "img/facility/2_3.jpg"
-    ],
-    "role": "서예·한문·캘리그래피 프로그램 운영",
-    "usage": "수업 등록 후 이용"
-   },
-   {
-    "name": "장기바둑실",
-    "photos": [
-     "img/facility/2_4.jpg"
-    ],
-    "role": "장기·바둑 등 두뇌활동 여가 공간",
-    "usage": "이용 등록 후 자율 이용"
-   },
-   {
-    "name": "정보화실",
-    "photos": [
-     "img/facility/2_5.jpg"
-    ],
-    "role": "컴퓨터·스마트폰 교육 프로그램 운영",
-    "usage": "수업 등록 후 이용"
-   },
-   {
-    "name": "강사대기실",
-    "photos": [
-     "img/facility/2_6.jpg"
-    ],
-    "role": "외부 강사 대기 및 준비 공간",
-    "usage": "강사 전용"
-   },
-   {
-    "name": "주차장",
-    "photos": [
-     "img/facility/2_7.jpg"
-    ],
-    "role": "복지관 이용자 및 방문자 주차 공간",
-    "usage": "2층 연결 주차장 이용"
-   }
-  ]
- },
- {
-  "code": "f3",
-  "badge": "3F",
-  "name": "3층",
-  "rooms": [
-   {
-    "name": "다목적체육실",
-    "photos": [
-     "img/facility/3_1.jpg"
-    ],
-    "role": "탁구실 운영",
-    "usage": "1~4층 키오스크를 통해 예약"
-   },
-   {
-    "name": "소강당",
-    "photos": [
-     "img/facility/3_2.jpg"
-    ],
-    "role": "댄스, 요가, 필라테스 등 50명 이내 프로그램 운영",
-    "usage": "프로그램 일정에 따라 운영"
-   },
-   {
-    "name": "당구실",
-    "photos": [
-     "img/facility/3_3.jpg"
-    ],
-    "role": "당구(캐롬·포켓) 여가 활동 공간",
-    "usage": "1~4층 키오스크를 통해 예약"
-   },
-   {
-    "name": "포켓볼실",
-    "photos": [
-     "img/facility/3_4.jpg"
-    ],
-    "role": "포켓볼 여가 활동 공간",
-    "usage": "1~4층 키오스크를 통해 예약"
-   },
-   {
-    "name": "프로그램실1",
-    "photos": [
-     "img/facility/3_5.jpg"
-    ],
-    "role": "언어, 공예 등 소규모 인원 프로그램 운영",
-    "usage": "프로그램 일정에 따라 운영"
-   },
-   {
-    "name": "야외테라스",
-    "photos": [
-     "img/facility/3_6.jpg"
-    ],
-    "role": "야외 휴식 공간",
-    "usage": "자유 이용"
-   }
-  ]
- },
- {
-  "code": "f4",
-  "badge": "4F",
-  "name": "4층",
-  "rooms": [
-   {
-    "name": "대강당",
-    "photos": [
-     "img/facility/4_1_1.jpg",
-     "img/facility/4_1_2.jpg"
-    ],
-    "role": "대규모 행사·공연·강연 개최 공간",
-    "usage": "행사 일정에 따라 운영"
-   },
-   {
-    "name": "우리방송국",
-    "photos": [
-     "img/facility/4_2_1.jpg",
-     "img/facility/4_2_2.jpg"
-    ],
-    "role": "복지관 자체 방송 제작 및 미디어 교육 공간",
-    "usage": "-"
-   },
-   {
-    "name": "우리배움터",
-    "photos": [
-     "img/facility/4_3.jpg"
-    ],
-    "role": "소규모 교육 및 학습 프로그램 운영 공간",
-    "usage": "수업 등록 후 이용"
-   },
-   {
-    "name": "우리소리쉼",
-    "photos": [
-     "img/facility/4_4.jpg"
-    ],
-    "role": "신체적, 정신적 여유로운 쉼을 위한 공간",
-    "usage": "자유 이용"
-   },
-   {
-    "name": "우리책이음",
-    "photos": [
-     "img/facility/4_5_1.jpg",
-     "img/facility/4_5_2.jpg"
-    ],
-    "role": "어르신 독서 및 소규모 도서 열람 공간",
-    "usage": "자유 이용"
-   },
-   {
-    "name": "우리체험터",
-    "photos": [],
-    "role": "AI 기기 활용에 최적화된 체험 공간",
-    "usage": "자유 이용"
-   },
-   {
-    "name": "우리키오스크",
-    "photos": [],
-    "role": "일상생활에서 접하는 여러 키오스크 체험",
-    "usage": "자유 이용"
-   },
-   {
-    "name": "우리갤러리",
-    "photos": [],
-    "role": "어르신 작품 전시 및 문화 향유 공간",
-    "usage": "자유 관람"
-   },
-   {
-    "name": "장독뜰",
-    "photos": [
-     "img/facility/4_9.jpg"
-    ],
-    "role": "복지관 전경이 보이는 편안한 쉼터",
-    "usage": "-"
-   }
-  ]
- }
-]
+{
+ "기관정보": [
+  {
+   "항목": "기관명",
+   "내용": "북원노인종합복지관"
+  },
+  {
+   "항목": "운영법인",
+   "내용": "사회복지법인 밥상공동체복지재단"
+  },
+  {
+   "항목": "설치신고",
+   "내용": "2023. 5. 23."
+  },
+  {
+   "항목": "소재지",
+   "내용": "강원도 원주시 흥양로50번길 5"
+  },
+  {
+   "항목": "전화번호",
+   "내용": "033-747-0516"
+  },
+  {
+   "항목": "팩스",
+   "내용": "033-747-0517"
+  },
+  {
+   "항목": "시설규모",
+   "내용": "지하 1층, 지상 4층, 연면적 2,879㎡"
+  }
+ ],
+ "층": [
+  {
+   "code": "exterior",
+   "badge": "전경",
+   "name": "전경",
+   "rooms": [
+    {
+     "name": "건물 전경",
+     "photos": [
+      "img/facility/9_1.jpg",
+      "img/facility/9_2.jpg"
+     ],
+     "role": "원주시 북부권역의 복지거점, 북원노인종합복지관 입니다.",
+     "usage": ""
+    }
+   ]
+  },
+  {
+   "code": "f1",
+   "badge": "1F",
+   "name": "1층",
+   "rooms": [
+    {
+     "name": "사무실",
+     "photos": [
+      "img/facility/1_1.jpg"
+     ],
+     "role": "복지관 행정 업무 및 이용자 접수·상담 창구",
+     "usage": "평일 09:00~18:00 방문"
+    },
+    {
+     "name": "물리치료실",
+     "photos": [
+      "img/facility/1_2.jpg"
+     ],
+     "role": "이용자의 건강증진을 목적으로 물리치료 및 재활 프로그램 운영",
+     "usage": "1~4층 키오스크를 통해 예약"
+    },
+    {
+     "name": "건강관리실",
+     "photos": [
+      "img/facility/1_4_1.jpg",
+      "img/facility/1_4_2.jpg",
+      "img/facility/1_4_3.jpg"
+     ],
+     "role": "체력증진을 위한 운동기기 및 프로그램 운영",
+     "usage": "이용 등록 후 자율 이용"
+    },
+    {
+     "name": "음악실",
+     "photos": [
+      "img/facility/1_5.jpg"
+     ],
+     "role": "음악(악기) 관련 프로그램 운영",
+     "usage": "수업 등록 후 이용"
+    },
+    {
+     "name": "상담실",
+     "photos": [
+      "img/facility/1_3.jpg"
+     ],
+     "role": "개별 상담 및 사례관리 면담 진행",
+     "usage": "복지관 상담 요청 시"
+    },
+    {
+     "name": "회의실",
+     "photos": [
+      "img/facility/1_9.jpg"
+     ],
+     "role": "복지관 업무 회의 및 내빈 방문 시 활용",
+     "usage": "-"
+    }
+   ]
+  },
+  {
+   "code": "f2",
+   "badge": "2F",
+   "name": "2층",
+   "rooms": [
+    {
+     "name": "온기식당",
+     "photos": [
+      "img/facility/2_1.jpg"
+     ],
+     "role": "어르신 중식 제공 및 경로식당 운영",
+     "usage": "복지관 이용 등록 후 키오스크 발권"
+    },
+    {
+     "name": "요리교실",
+     "photos": [
+      "img/facility/2_2.jpg"
+     ],
+     "role": "요리 실습, 봉사단 제과/제빵 프로그램 운영",
+     "usage": "-"
+    },
+    {
+     "name": "서예실",
+     "photos": [
+      "img/facility/2_3.jpg"
+     ],
+     "role": "서예·한문·캘리그래피 프로그램 운영",
+     "usage": "수업 등록 후 이용"
+    },
+    {
+     "name": "장기바둑실",
+     "photos": [
+      "img/facility/2_4.jpg"
+     ],
+     "role": "장기·바둑 등 두뇌활동 여가 공간",
+     "usage": "이용 등록 후 자율 이용"
+    },
+    {
+     "name": "정보화실",
+     "photos": [
+      "img/facility/2_5.jpg"
+     ],
+     "role": "컴퓨터·스마트폰 교육 프로그램 운영",
+     "usage": "수업 등록 후 이용"
+    },
+    {
+     "name": "강사대기실",
+     "photos": [
+      "img/facility/2_6.jpg"
+     ],
+     "role": "외부 강사 대기 및 준비 공간",
+     "usage": "강사 전용"
+    },
+    {
+     "name": "주차장",
+     "photos": [
+      "img/facility/2_7.jpg"
+     ],
+     "role": "복지관 이용자 및 방문자 주차 공간",
+     "usage": "2층 연결 주차장 이용"
+    }
+   ]
+  },
+  {
+   "code": "f3",
+   "badge": "3F",
+   "name": "3층",
+   "rooms": [
+    {
+     "name": "다목적체육실",
+     "photos": [
+      "img/facility/3_1.jpg"
+     ],
+     "role": "탁구실 운영",
+     "usage": "1~4층 키오스크를 통해 예약"
+    },
+    {
+     "name": "소강당",
+     "photos": [
+      "img/facility/3_2.jpg"
+     ],
+     "role": "댄스, 요가, 필라테스 등 50명 이내 프로그램 운영",
+     "usage": "프로그램 일정에 따라 운영"
+    },
+    {
+     "name": "당구실",
+     "photos": [
+      "img/facility/3_3.jpg"
+     ],
+     "role": "당구(캐롬·포켓) 여가 활동 공간",
+     "usage": "1~4층 키오스크를 통해 예약"
+    },
+    {
+     "name": "포켓볼실",
+     "photos": [
+      "img/facility/3_4.jpg"
+     ],
+     "role": "포켓볼 여가 활동 공간",
+     "usage": "1~4층 키오스크를 통해 예약"
+    },
+    {
+     "name": "프로그램실1",
+     "photos": [
+      "img/facility/3_5.jpg"
+     ],
+     "role": "언어, 공예 등 소규모 인원 프로그램 운영",
+     "usage": "프로그램 일정에 따라 운영"
+    },
+    {
+     "name": "야외테라스",
+     "photos": [
+      "img/facility/3_6.jpg"
+     ],
+     "role": "야외 휴식 공간",
+     "usage": "자유 이용"
+    }
+   ]
+  },
+  {
+   "code": "f4",
+   "badge": "4F",
+   "name": "4층",
+   "rooms": [
+    {
+     "name": "대강당",
+     "photos": [
+      "img/facility/4_1_1.jpg",
+      "img/facility/4_1_2.jpg"
+     ],
+     "role": "대규모 행사·공연·강연 개최 공간",
+     "usage": "행사 일정에 따라 운영"
+    },
+    {
+     "name": "우리방송국",
+     "photos": [
+      "img/facility/4_2_1.jpg",
+      "img/facility/4_2_2.jpg"
+     ],
+     "role": "복지관 자체 방송 제작 및 미디어 교육 공간",
+     "usage": "-"
+    },
+    {
+     "name": "우리배움터",
+     "photos": [
+      "img/facility/4_3.jpg"
+     ],
+     "role": "소규모 교육 및 학습 프로그램 운영 공간",
+     "usage": "수업 등록 후 이용"
+    },
+    {
+     "name": "우리소리쉼",
+     "photos": [
+      "img/facility/4_4.jpg"
+     ],
+     "role": "신체적, 정신적 여유로운 쉼을 위한 공간",
+     "usage": "자유 이용"
+    },
+    {
+     "name": "우리책이음",
+     "photos": [
+      "img/facility/4_5_1.jpg",
+      "img/facility/4_5_2.jpg"
+     ],
+     "role": "어르신 독서 및 소규모 도서 열람 공간",
+     "usage": "자유 이용"
+    },
+    {
+     "name": "우리체험터",
+     "photos": [],
+     "role": "AI 기기 활용에 최적화된 체험 공간",
+     "usage": "자유 이용"
+    },
+    {
+     "name": "우리키오스크",
+     "photos": [],
+     "role": "일상생활에서 접하는 여러 키오스크 체험",
+     "usage": "자유 이용"
+    },
+    {
+     "name": "우리갤러리",
+     "photos": [],
+     "role": "어르신 작품 전시 및 문화 향유 공간",
+     "usage": "자유 관람"
+    },
+    {
+     "name": "장독뜰",
+     "photos": [
+      "img/facility/4_9.jpg"
+     ],
+     "role": "복지관 전경이 보이는 편안한 쉼터",
+     "usage": "-"
+    }
+   ]
+  }
+ ]
+}
