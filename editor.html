@@ -15,6 +15,9 @@ html,body{height:100%;background:var(--bg);color:var(--ink);}
 .btn:hover{border-color:var(--brand);}
 .btn.pri{background:var(--brand);border-color:var(--brand);color:#fff;}
 .btn.ok{border-color:#2E8B77;color:#2E8B77;}
+.btn.sm{font-size:12px;padding:6px 10px;color:#7a6a58;}
+.btn.big{font-size:15px;padding:10px 18px;}
+.btn.pri.off{background:#cbbfb2;border-color:#cbbfb2;}
 .btn:disabled{opacity:.6;cursor:wait;}
 .btn input{display:none;}
 .seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;}
@@ -105,9 +108,9 @@ tr.dragging{opacity:.35;} tr.over td{box-shadow:inset 0 3px 0 var(--brand);}
   <label class="btn">📂 내 엑셀 열기<input type="file" id="file" accept=".xlsx"></label>
   <div class="seg" id="devseg"><button data-d="pc" class="on">PC 화면</button><button data-d="mo">모바일</button></div>
   <div class="sp"></div>
-  <button class="btn" id="ghset" title="GitHub 연결 설정">🔑 <span id="ghst">GitHub 연결</span></button>
-  <button class="btn" id="dl">💾 엑셀 내려받기</button>
-  <button class="btn pri" id="ghup">⬆ 홈페이지에 바로 올리기</button>
+  <button class="btn sm" id="ghset" title="관리자용: 이 PC를 홈페이지(GitHub)와 연결">⚙ <span id="ghst">관리자 설정</span></button>
+  <button class="btn sm" id="dl" title="엑셀 파일로 저장 (연결 안 된 PC에서 관리자에게 전달할 때)">💾 엑셀로 저장</button>
+  <button class="btn pri big" id="ghup">⬆ 홈페이지에 올리기</button>
 </div>
 <div class="wrap">
   <div class="left">
@@ -446,7 +449,7 @@ function setPage(k){
   pageKey=k;P=PAGES[k];rows=[];blobs.clear();fblobs.clear();upFiles.clear();curTab='';lastHi=null;dirty=false;tpl=null;heights=[];lastDoc=null;
   document.getElementById('pagesel').value=k;
   document.getElementById('pvtitle').textContent='실제 홈페이지 미리보기 ('+P.crumb+')';
-  document.getElementById('hint').innerHTML='<b>'+P.name+'</b> 페이지를 편집합니다. 왼쪽을 고치면 <b>오른쪽 화면이 바로</b> 바뀌어요.<br>다 고쳤으면 <b>[💾 수정한 엑셀 내려받기]</b> → GitHub <code>'+P.xlsx+'</code>에 같은 이름으로 덮어쓰면 반영돼요.'
+  document.getElementById('hint').innerHTML='<b>'+P.name+'</b> 페이지를 편집합니다. 왼쪽을 고치면 <b>오른쪽 화면이 바로</b> 바뀌어요.<br>다 고쳤으면 <b>[⬆ 홈페이지에 올리기]</b>를 누르면 1~2분 뒤 홈페이지에 반영돼요.'
     +(P.frame?'<br>CMS iframe 주소: <code>'+P.frame+'</code>':'');
   document.getElementById('editor').innerHTML='<div class="empty">위에서 <b>[🌐 현재 홈페이지 내용 불러오기]</b>를 누르면<br>지금 홈페이지에 올라가 있는 내용이 그대로 들어와요.</div>';
   document.getElementById('valbox').innerHTML='';document.getElementById('hbox').innerHTML='';
@@ -780,20 +783,20 @@ document.getElementById('dl').addEventListener('click',function(){
 var GH_API=QS.get('api')||'https://api.github.com', GH_REPO=QS.get('repo')||'bukwonsenior/homepage', GH_BRANCH='main';
 function ghToken(){try{return localStorage.getItem('bw_gh_token')||'';}catch(e){return '';}}
 function ghSetToken(v){try{if(v)localStorage.setItem('bw_gh_token',v);else localStorage.removeItem('bw_gh_token');}catch(e){}}
-function ghStatus(){document.getElementById('ghst').textContent=ghToken()?'GitHub 연결됨':'GitHub 연결';document.getElementById('ghset').classList.toggle('ok',!!ghToken());}
+function ghStatus(){var on=!!ghToken();document.getElementById('ghst').textContent=on?'연결됨':'관리자 설정';document.getElementById('ghset').classList.toggle('ok',on);document.getElementById('ghup').classList.toggle('off',!on);}
 function gh(method,path,body){
   return fetch(GH_API+'/repos/'+GH_REPO+path,{method:method,headers:{'Authorization':'Bearer '+ghToken(),'Accept':'application/vnd.github+json','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined})
     .then(function(r){return r.json().catch(function(){return {};}).then(function(j){if(!r.ok){var e=new Error((j&&j.message)||('HTTP '+r.status));e.status=r.status;throw e;}return j;});});
 }
 function ghErr(e){
-  if(e.status===401)return '토큰이 맞지 않거나 기한이 지났어요. [GitHub 연결]에서 새 토큰을 넣어 주세요.';
+  if(e.status===401)return '토큰이 맞지 않거나 기한이 지났어요. 관리자에게 다시 연결을 요청해 주세요 ([⚙ 관리자 설정]).';
   if(e.status===403||e.status===404)return '이 토큰에 저장소 쓰기 권한이 없어요. 토큰 권한(Contents: Read and write, 저장소 '+GH_REPO+')을 확인해 주세요.';
   if(e.status===422||e.status===409)return '그사이 다른 사람이 먼저 올렸어요. 잠시 뒤 다시 눌러 주세요.';
   return '올리지 못했어요 ('+esc(e.message||e)+'). 인터넷 연결을 확인하거나 [엑셀 내려받기]로 올려 주세요.';
 }
 document.getElementById('ghset').addEventListener('click',function(){
   var cur=ghToken();
-  var v=prompt((cur?'지금 이 PC는 GitHub에 연결돼 있어요.\n새 토큰을 붙여넣으면 바뀌고, 비우고 확인하면 연결이 해제돼요.\n\n':'')+'GitHub 토큰을 붙여넣어 주세요 (github_pat_로 시작).\n※ 이 PC의 이 브라우저에만 저장돼요. 공용 PC에서는 쓰지 마세요.',cur?'':'');
+  var v=prompt('【관리자용】\n'+(cur?'지금 이 PC는 홈페이지(GitHub)에 연결돼 있어요.\n새 토큰을 붙여넣으면 바뀌고, 비우고 확인하면 연결이 해제돼요.\n\n':'')+'GitHub 토큰을 붙여넣어 주세요 (github_pat_로 시작).\n※ 이 PC의 이 브라우저에만 저장돼요. 공용 PC에서는 쓰지 마세요.',cur?'':'');
   if(v===null)return;v=v.trim();
   if(!v){ghSetToken('');ghStatus();toast('GitHub 연결을 해제했어요.');return;}
   ghSetToken(v);ghStatus();
@@ -814,7 +817,7 @@ function fileBytes(f){  // 1MB 넘는 jpg는 가로·세로 1600px 이하로 줄
 var ghBusy=false;
 document.getElementById('ghup').addEventListener('click',function(){
   if(!rows.length){alert('먼저 내용을 불러와 주세요.');return;}
-  if(!ghToken()){alert('먼저 [🔑 GitHub 연결]을 눌러 토큰을 넣어 주세요.\n(토큰이 없으면 [💾 엑셀 내려받기]로 올리면 돼요)');return;}
+  if(!ghToken()){alert('이 PC는 아직 홈페이지와 연결되지 않았어요.\n\n관리자에게 "편집기 연결"을 한 번 요청해 주세요. (1분이면 끝나요)\n급하면 [💾 엑셀로 저장]을 눌러 저장한 파일을 관리자에게 보내 주세요.');return;}
   var errs=validate();if(errs.length){alert('고쳐야 할 곳이 '+errs.length+'개 있어요. 빨간 상자 내용을 먼저 고쳐 주세요.');return;}
   if(ghBusy)return;
   var ph=newPhotos();
@@ -837,7 +840,7 @@ document.getElementById('ghup').addEventListener('click',function(){
     dirty=false;upFiles.clear();
     toast('✅ 홈페이지에 올렸어요. 1~2분 뒤 반영돼요.<br><a href="https://github.com/'+GH_REPO+'/actions" target="_blank" style="color:#ffd8a8">진행 상황 보기 ›</a>',12000);
   }).catch(function(e){alert(ghErr(e));})
-  .then(function(){ghBusy=false;btn.disabled=false;btn.textContent='⬆ 홈페이지에 바로 올리기';});
+  .then(function(){ghBusy=false;btn.disabled=false;btn.textContent='⬆ 홈페이지에 올리기';});
 });
 ghStatus();
 
