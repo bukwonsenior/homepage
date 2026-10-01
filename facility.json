@@ -57,7 +57,7 @@
    {
     "name": "상담실",
     "photos": [
-     "img/facility/1_6.jpg"
+     "img/facility/1_3.jpg"
     ],
     "role": "개별 상담 및 사례관리 면담 진행",
     "usage": "복지관 상담 요청 시"
@@ -65,7 +65,7 @@
    {
     "name": "회의실",
     "photos": [
-     "img/facility/1_7.jpg"
+     "img/facility/1_9.jpg"
     ],
     "role": "복지관 업무 회의 및 내빈 방문 시 활용",
     "usage": "-"
@@ -240,32 +240,26 @@
    },
    {
     "name": "우리체험터",
-    "photos": [
-     "img/facility/4_6"
-    ],
+    "photos": [],
     "role": "AI 기기 활용에 최적화된 체험 공간",
     "usage": "자유 이용"
    },
    {
     "name": "우리키오스크",
-    "photos": [
-     "img/facility/4_7"
-    ],
+    "photos": [],
     "role": "일상생활에서 접하는 여러 키오스크 체험",
     "usage": "자유 이용"
    },
    {
     "name": "우리갤러리",
-    "photos": [
-     "img/facility/4_8"
-    ],
+    "photos": [],
     "role": "어르신 작품 전시 및 문화 향유 공간",
     "usage": "자유 관람"
    },
    {
     "name": "장독뜰",
     "photos": [
-     "img/facility/4_9"
+     "img/facility/4_9.jpg"
     ],
     "role": "복지관 전경이 보이는 편안한 쉼터",
     "usage": "-"
