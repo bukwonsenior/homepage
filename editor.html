@@ -92,6 +92,7 @@ tr.dragging{opacity:.35;} tr.over td{box-shadow:inset 0 3px 0 var(--brand);}
 #pvbox{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#fff;}
 #pv{border:0;display:block;transform-origin:top left;background:#fff;}
 #toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#2B2320;color:#fff;padding:12px 18px;border-radius:12px;font-size:13.5px;font-weight:700;line-height:1.6;display:none;z-index:99;max-width:680px;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+.thumbs{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;align-items:center}.thumbs img{width:64px;height:48px;object-fit:cover;border-radius:6px;border:1px solid #e4dcd2}.thumbs .noimg{font-size:11px;color:#b45309;background:#fff7ed;border-radius:6px;padding:4px 6px;max-width:150px}.tadd{cursor:pointer;font-size:20px;padding:2px 6px;border:1px dashed #ccc;border-radius:6px}.tadd input{display:none}
 </style></head>
 <body>
 <div class="top">
@@ -267,9 +268,27 @@ PAGES.history=page({
   }
 });
 
+/* ---- 시설안내: 한 줄 = 실(방), 층명 = 탭, 사진은 쉼표로 여러 장 ---- */
+function splitPh(v){return String(v||'').split(',').map(function(x){return x.trim();}).filter(Boolean).map(function(f){return /^http/.test(f)||/\.(jpe?g|png|webp|gif)$/i.test(f)?f:f+'.jpg';});}
+function floorCode(n){var m=n.match(/^(\d+)\s*층$/);if(m)return['f'+m[1],m[1]+'F'];m=n.match(/^(?:지하|B)\s*(\d+)\s*층?$/i);if(m)return['b'+m[1],'B'+m[1]];if(n==='전경')return['exterior','전경'];return[n,n];}
+PAGES.facility=page({
+  group:'기관소개', name:'시설안내', crumb:'기관소개 › 시설안내', html:'facility-guide.html', xlsx:'북원_시설안내.xlsx', sheet:'시설안내', img:'img/facility/', imgVar:false,
+  map:[['게시',0],['층명',1],['실명',3],['사진',7],['역할',4],['이용방법',5]], headKey:'실명', fixedKind:'실', tabWord:'층',
+  tab:[{k:'실',label:'실(방)',req:3,cols:[{c:3,h:'실 이름'},{c:7,h:'사진 (쉼표로 최대 3장)',photos:1},{c:4,h:'장소 역할',ta:1},{c:5,h:'이용방법',ta:1}],hi:'.room-btn',
+    tip:'층 이름: 전경 / 1층 / 2층 … · 사진이 없으면 비워 두세요(화면에 "사진 준비 중") · 📷로 사진을 고르면 미리보기에 바로 보여요'}],
+  guide:['■ 한 줄 = 실(방) 하나. 층명이 같은 줄끼리 한 층으로 묶이고 나온 순서대로 화면에 나옵니다.','■ 사진: img/facility/ 폴더의 파일명. 여러 장은 쉼표로 (최대 3장).','■ 게시: O=보임 / X=숨김'],
+  build:function(rows,url){
+    var F=[],m={};
+    rows.forEach(function(r){ if(isX(r)||!r[1]||!r[3])return; var fc=floorCode(r[1]);
+      if(!m[r[1]]){m[r[1]]={code:fc[0],badge:fc[1],name:r[1],rooms:[]};F.push(m[r[1]]);}
+      m[r[1]].rooms.push({name:r[3],photos:splitPh(r[7]).slice(0,3).map(function(f){return /^http/.test(f)?f:url(r,f);}),role:r[4],usage:r[5]}); });
+    F.탭=F.map(function(f){return {이름:f.name};}); return F;
+  }
+});
+
 /* ================= 상태 ================= */
 var P=null,pageKey=null,rows=[],tpl=null,tplOld=false,dev='pc',curTab='',lastHi=null,dirty=false;
-var blobs=new Map(), heights=[], renderTimer=null, lastDoc=null;
+var blobs=new Map(), fblobs=new Map(), heights=[], renderTimer=null, lastDoc=null;
 
 /* ================= 유틸 ================= */
 function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -279,7 +298,7 @@ function specOf(r){return ((r[1]?P.tab:P.top).filter(function(s){return s.k===r[
 function kindsOf(area){return (area==='top'?P.top:P.tab).map(function(s){return s.k;});}
 function tabNames(){var seen={},l=[];rows.forEach(function(r){if(r[1]&&!seen[r[1]]){seen[r[1]]=1;l.push(r[1]);}});return l;}
 function pf(r){return r[P.photo.file]||'';}
-function photoURL(r,f){return blobs.get(r)||(LIVE+P.img+encodeURIComponent(f));}
+function photoURL(r,f){return fblobs.get(f)||blobs.get(r)||(LIVE+P.img+encodeURIComponent(f));}
 function mark(){dirty=true;}
 function fileVal(slot){var v='';rows.forEach(function(r){if(r[slot])v=r[slot];});if(!v){var f=P.fileFields.filter(function(x){return x.slot===slot;})[0];v=f?f.def||'':'';}return v;}
 function blank(tab,k){var r=[];for(var i=0;i<P.nslots;i++)r.push('');r[0]='O';r[1]=tab||'';r[2]=k;P.fileFields.forEach(function(f){if(f.fill)r[f.slot]=fileVal(f.slot);});return r;}
@@ -294,7 +313,7 @@ function rendered(){return lastDoc?lastDoc.탭.map(function(t){return t.이름||
   s.addEventListener('change',function(){if(dirty&&!confirm('내려받지 않은 수정 내용이 있어요. 다른 페이지로 넘어갈까요?')){s.value=pageKey;return;}setPage(s.value);});
 })();
 function setPage(k){
-  pageKey=k;P=PAGES[k];rows=[];blobs.clear();curTab='';lastHi=null;dirty=false;tpl=null;heights=[];lastDoc=null;
+  pageKey=k;P=PAGES[k];rows=[];blobs.clear();fblobs.clear();curTab='';lastHi=null;dirty=false;tpl=null;heights=[];lastDoc=null;
   document.getElementById('pagesel').value=k;
   document.getElementById('pvtitle').textContent='실제 홈페이지 미리보기 ('+P.crumb+')';
   document.getElementById('hint').innerHTML='<b>'+P.name+'</b> 페이지를 편집합니다. 왼쪽을 고치면 <b>오른쪽 화면이 바로</b> 바뀌어요.<br>다 고쳤으면 <b>[💾 수정한 엑셀 내려받기]</b> → GitHub <code>'+P.xlsx+'</code>에 같은 이름으로 덮어쓰면 반영돼요.'
@@ -307,7 +326,7 @@ function loadTemplate(){
   var want=pageKey;
   fetch(RAW+P.html+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(t){
     if(want!==pageKey)return;
-    tplOld=!/tabpanel/.test(t)||(!!P.img&&!/var IMG_BASE=/.test(t));
+    tplOld=!/tabpanel|__bwHi/.test(t)||(!!P.img&&P.imgVar!==false&&!/var IMG_BASE=/.test(t));
     var LOAD="setTimeout(function(){try{render(window.__BW__||{});}catch(e){document.getElementById('app').innerHTML='<div class=\"none\">미리보기 오류: '+e.message+'</div>';}},0);";
     if(/\/\*BW_LOAD\*\/[\s\S]*?\/\*BW_LOAD_END\*\//.test(t)) t=t.replace(/\/\*BW_LOAD\*\/[\s\S]*?\/\*BW_LOAD_END\*\//,function(){return LOAD;});
     else t=t.replace(/fetch\('data\/[^']+\.json[\s\S]*?불러오지 못했습니다[\s\S]*?\}\);/,function(){return LOAD;});
@@ -406,6 +425,7 @@ function rowHTML(s,i){
   h+='<td><select onchange="upd('+i+',0,this.value,1)"><option'+(isX(r)?'':' selected')+'>O</option><option'+(isX(r)?' selected':'')+'>X</option></select></td>';
   s.cols.forEach(function(col){
     if(col.icon)h+='<td><button class="icbtn" onclick="openIcon('+i+',event)">'+(r[6]&&ICONS[r[6]]?svg(r[6]):'<span class="none">'+(s.k==='정보'?'자동':'선택')+'</span>')+'</button></td>';
+    else if(col.photos){var fs=splitPh(r[col.c]);h+='<td><input value="'+esc(r[col.c])+'" oninput="upd('+i+','+col.c+',this.value)" onchange="buildEditor()"><div class="thumbs">'+fs.map(function(f){return '<img src="'+esc(photoURL(r,f))+'" data-f="'+esc(f)+'" onerror="imgFail(this)">';}).join('')+'<label class="tadd" title="사진 추가">📷<input type="file" accept="image/*" multiple onchange="addPh('+i+','+col.c+',this.files);this.value=\'\'"></label></div></td>';}
     else if(col.ta)h+='<td><textarea oninput="upd('+i+','+col.c+',this.value)">'+esc(r[col.c])+'</textarea></td>';
     else h+='<td><input value="'+esc(r[col.c])+'" oninput="upd('+i+','+col.c+',this.value)"></td>';
   });
@@ -422,6 +442,14 @@ function addRow(k,tab){
   if(at<0)rows.push(r);else rows.splice(at+1,0,r);
   mark();buildEditor();render(true);
   setTimeout(function(){var el=document.querySelector('tr[data-i="'+rows.indexOf(r)+'"] input,tr[data-i="'+rows.indexOf(r)+'"] textarea');if(el)el.focus();},30);
+}
+function addPh(i,c,files){
+  var list=splitPh(rows[i][c]);
+  for(var n=0;n<files.length;n++){var f=files[n],name=f.name.replace(/\s+/g,'_');
+    if(f.size>2*1024*1024)toast('⚠️ '+esc(f.name)+' 은(는) 2MB가 넘어요. 홈페이지가 느려질 수 있어요.',5000);
+    fblobs.set(name,URL.createObjectURL(f));if(list.indexOf(name)<0)list.push(name);}
+  if(list.length>3)toast('⚠️ 사진은 3장까지만 보여요.',4000);
+  upd(i,c,list.join(', '),1);
 }
 function delRow(i){var r=rows[i];if(blobs.get(r)){URL.revokeObjectURL(blobs.get(r));blobs.delete(r);}rows.splice(i,1);mark();buildEditor();render(true);}
 var dragRow=null;
@@ -507,6 +535,7 @@ function validate(){
     if(s.req&&!r[s.req])errs.push(ln+': '+s.label.replace(/ \(.*\)$/,'')+' 줄에는 '+(s.cols.filter(function(c){return c.c===s.req;})[0]||{h:'이름'}).h.replace(/ \(.*\)$/,'')+'이(가) 필요해요');
     if(s.need&&!r[s.need])warns.push(ln+': '+k+'의 이름이 비어 있어요');
     if(s.photo&&!pf(r))errs.push(ln+': 사진 파일명이 없어요');
+    (s.cols||[]).forEach(function(col){if(col.photos&&splitPh(r[col.c]).length>3)warns.push(ln+': 사진은 3장까지만 보여요 (4장째부터 안 나와요)');});
     if(P.privacy)PRIV.forEach(function(p){var m=(r[3]+' '+r[4]+' '+r[5]).match(p[0]);if(m)errs.push(ln+': '+p[1]+'로 보이는 값이 있어요 → '+esc(m[0])+' (개인정보는 올릴 수 없어요)');});
   });
   var names=rendered();
@@ -531,7 +560,7 @@ function doRender(){
   var helper='<style>.bwhi{outline:5px solid #FF2D2D!important;outline-offset:4px;border-radius:14px;box-shadow:0 0 0 4px rgba(255,45,45,.22),0 0 26px rgba(255,45,45,.55)!important;animation:bwp 1.1s ease-in-out infinite;}@keyframes bwp{50%{outline-color:#ff9a9a}}</style>'
    +'<script>(function(){'
    +'function tab(i){if(i==null||i<0)return;var p=document.getElementById("tp"+i);if(p&&p.classList.contains("hidden")){var b=document.querySelectorAll(".seg button")[i];if(b)b.click();}}'
-   +'function hi(m){if(!m)return;setTimeout(function(){tab(m.tab);document.querySelectorAll(".bwhi").forEach(function(x){x.classList.remove("bwhi");});'
+   +'function hi(m){if(!m)return;setTimeout(function(){document.querySelectorAll(".bwhi").forEach(function(x){x.classList.remove("bwhi");});if(window.__bwHi&&window.__bwHi(m))return;tab(m.tab);'
    +'var root=(m.tab!=null&&m.tab>=0)?document.getElementById("tp"+m.tab):document;if(!root)return;var el=root.querySelectorAll(m.sel)[m.pos||0];'
    +'if(el){if(el.tagName==="DETAILS")el.open=true;el.classList.add("bwhi");el.scrollIntoView({block:"center",behavior:"smooth"});}},70);}'
    +'function hs(){var ps=[].slice.call(document.querySelectorAll(".tabpanel")),w=document.querySelector(".wrap");if(!w)return;var cur=ps.findIndex(function(p){return !p.classList.contains("hidden");}),out=[];'
@@ -555,7 +584,7 @@ window.addEventListener('message',function(e){
   var d=e.data||{};
   if(d.bwH){heights=d.bwH;sizePv(d.cur);validate();
     var names=rendered();
-    document.getElementById('hbox').innerHTML='· 탭별 높이('+(dev==='pc'?'PC':'모바일')+'): '+heights.map(function(h,i){return '<span class="'+(h>2000?'bad':'ok')+'">'+esc(names[i]||'전체')+' '+h+'px</span>';}).join(' / ');}
+    document.getElementById('hbox').innerHTML='· '+(heights.length>1?'탭별 ':'')+'높이('+(dev==='pc'?'PC':'모바일')+'): '+heights.map(function(h,i){return '<span class="'+(h>2000?'bad':'ok')+'">'+esc(heights.length>1?(names[i]||''):'페이지 전체')+' '+h+'px</span>';}).join(' / ');}
 });
 document.getElementById('editor').addEventListener('focusin',function(e){
   var tr=e.target.closest('[data-i]');if(!tr)return;var i=+tr.dataset.i,r=rows[i];if(!r)return;
@@ -587,6 +616,7 @@ document.getElementById('dl').addEventListener('click',function(){
   setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},1500);
   dirty=false;
   var news=rows.filter(function(r){return blobs.get(r);}).map(pf);
+  fblobs.forEach(function(u,n){if(rows.some(function(r){return r.some(function(v){return splitPh(v).indexOf(n)>=0;});}))news.push(n);});
   toast('💾 <b>'+fname+'</b> 내려받았어요 → GitHub <b>'+P.xlsx+'</b>에 덮어쓰기'+(news.length?'<br>📷 새 사진 '+news.length+'장도 <b>'+P.img+'</b>에 올려 주세요: '+news.map(esc).join(', '):''),9000);
 });
 

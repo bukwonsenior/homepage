@@ -2,13 +2,11 @@
 """
 시설안내 엑셀(북원_시설안내.xlsx) → facility.json
 
-엑셀 '시설안내' 시트 구조:
-  1~3행: 안내문 (무시)
-  4행: 헤더 → 게시 | 층코드 | 층명 | 실명 | 사진 | 역할 | 이용방법
-  5행~: 데이터
-
-사진 파일은 img/facility/ 폴더에 넣고, 엑셀에는 파일명만 적는다.
-(예: f1_office.jpg → img/facility/f1_office.jpg)
+'시설안내' 시트, 4행 머리글: 게시 | 층명 | 실명 | 사진 | 역할 | 이용방법   (5행부터 데이터)
+- 층명이 같은 줄끼리 한 층으로 묶이고, 나온 순서대로 화면에 그려진다.
+  층명 '1층'→ 배지 1F, '지하1층'/'B1층' → B1, 그 밖(예: 전경)은 그대로 배지.
+- 사진: img/facility/ 폴더의 파일명. 쉼표로 여러 장(최대 3). 확장자를 빼먹으면 .jpg로 본다.
+- (예전 형식의 '층코드' 칸이 있으면 그 값을 층 구분에 그대로 쓴다)
 """
 import json, re, sys
 from pathlib import Path
@@ -17,109 +15,67 @@ import openpyxl
 XLSX = Path("북원_시설안내.xlsx")
 OUT  = Path("facility.json")
 IMG_BASE = "img/facility/"
+IMG_DIR  = Path("img/facility")
 
-errors = []
-def err(row, msg): errors.append(f"{row}행: {msg}")
+errors, warns = [], []
 def s(v): return "" if v is None else str(v).strip()
+JUMIN = re.compile(r"\b\d{6}-\d{7}\b")
 
-JUMIN = re.compile(r"\b\d{6}[-]\d{7}\b")
+def floor_code(name):
+    m = re.fullmatch(r"(\d+)\s*층", name)
+    if m: return "f" + m.group(1), m.group(1) + "F"
+    m = re.fullmatch(r"(?:지하|B)\s*(\d+)\s*층?", name, re.I)
+    if m: return "b" + m.group(1), "B" + m.group(1)
+    if name == "전경": return "exterior", "전경"
+    return name, name
 
 def main():
-    if not XLSX.exists():
-        print(f"::error::{XLSX} 파일이 없습니다.")
-        sys.exit(1)
-
+    if not XLSX.exists(): print(f"::error::{XLSX} 파일이 없습니다."); sys.exit(1)
     wb = openpyxl.load_workbook(XLSX, data_only=True)
-    if "시설안내" not in wb.sheetnames:
-        print("::error::'시설안내' 시트가 없습니다.")
-        sys.exit(1)
+    if "시설안내" not in wb.sheetnames: print("::error::'시설안내' 시트가 없습니다."); sys.exit(1)
     ws = wb["시설안내"]
-
     head = [s(c.value) for c in ws[4]]
-    need = ["게시", "층코드", "층명", "실명", "사진", "역할", "이용방법"]
-    for h in need:
-        if h not in head:
-            errors.append(f"4행에 '{h}' 열이 없습니다.")
+    for h in ["게시", "층명", "실명", "사진", "역할", "이용방법"]:
+        if h not in head: errors.append(f"4행에 '{h}' 칸이 없습니다.")
     if errors:
-        for e in errors: print("  ✗ " + e)
+        for e in errors: print("::error::" + e)
         sys.exit(1)
-    ix = {h: head.index(h) for h in need}
+    ix = {h: i for i, h in enumerate(head) if h}
+    def col(row, n):
+        i = ix.get(n); return s(row[i]) if (i is not None and i < len(row)) else ""
 
-    # 데이터 파싱
-    floors = {}  # 층코드 → { badge, name, rooms: [] }
-    floor_order = []
-
+    floors, order = {}, []
     for r in range(5, ws.max_row + 1):
         row = [c.value for c in ws[r]]
         if not any(s(v) for v in row): continue
-
-        pub = s(row[ix["게시"]]).upper()
+        pub = col(row, "게시").upper()
         if pub in ("X", "×"): continue
-        if pub != "O":
-            err(r, f"게시 칸은 O 또는 X 만 (지금: '{s(row[ix['게시']])}')")
-            continue
-
-        code = s(row[ix["층코드"]])
-        fname = s(row[ix["층명"]])
-        rname = s(row[ix["실명"]])
-        photo = s(row[ix["사진"]])
-        role  = s(row[ix["역할"]])
-        usage = s(row[ix["이용방법"]])
-
-        if not code: err(r, "층코드가 비어 있습니다"); continue
-        if not rname: err(r, "실명이 비어 있습니다"); continue
-
-        # 개인정보 검사
-        line = " ".join(s(v) for v in row)
-        if JUMIN.search(line):
-            err(r, "주민등록번호로 보이는 값이 있습니다")
-
-        # 사진 경로 처리 (쉼표 구분, 최대 3장)
+        fname, rname = col(row, "층명"), col(row, "실명")
+        if not fname: errors.append(f"{r}행: 층명이 비어 있습니다"); continue
+        if not rname: errors.append(f"{r}행: 실명이 비어 있습니다"); continue
+        if JUMIN.search(" ".join(s(v) for v in row)): errors.append(f"{r}행: 주민등록번호로 보이는 값이 있습니다")
+        code, badge = floor_code(fname)
+        if "층코드" in ix and col(row, "층코드"): code = col(row, "층코드")
         photos = []
-        if photo:
-            parts = [p.strip() for p in photo.split(",") if p.strip()]
-            for p in parts[:3]:
-                if p.startswith("http"):
-                    photos.append(p)
-                else:
-                    photos.append(IMG_BASE + p)
-
+        for p in [p.strip() for p in col(row, "사진").split(",") if p.strip()][:3]:
+            if p.startswith("http"): photos.append(p); continue
+            if not re.search(r"\.(jpe?g|png|webp|gif)$", p, re.I): p += ".jpg"
+            if IMG_DIR.exists() and not (IMG_DIR / p).exists():
+                warns.append(f"{r}행 {rname}: img/facility/{p} 사진 파일이 아직 없습니다 (화면엔 '사진 준비 중')")
+            photos.append(IMG_BASE + p)
         if code not in floors:
-            # 층코드에서 배지 생성
-            badge = fname if fname else code
-            if code.startswith("f") and code[1:].isdigit():
-                badge = code[1:] + "F"
-            floors[code] = {"badge": badge, "name": fname, "rooms": []}
-            floor_order.append(code)
-
-        floors[code]["rooms"].append({
-            "name": rname,
-            "photos": photos,
-            "role": role,
-            "usage": usage
-        })
+            floors[code] = {"code": code, "badge": badge, "name": fname, "rooms": []}
+            order.append(code)
+        floors[code]["rooms"].append({"name": rname, "photos": photos, "role": col(row, "역할"), "usage": col(row, "이용방법")})
 
     if errors:
-        print("\n엑셀에서 고쳐야 할 곳이 있습니다.\n")
+        print("\n엑셀에서 고쳐야 할 곳:")
         for e in errors: print("  ✗ " + e)
-        print(f"::error::엑셀 오류 {len(errors)}건")
-        sys.exit(1)
-
-    # JSON 출력
-    result = []
-    for code in floor_order:
-        fl = floors[code]
-        result.append({
-            "code": code,
-            "badge": fl["badge"],
-            "name": fl["name"],
-            "rooms": fl["rooms"]
-        })
-
+        print(f"::error::엑셀 오류 {len(errors)}건"); sys.exit(1)
+    for w in warns: print("::warning::" + w)
+    result = [floors[c] for c in order]
     OUT.write_text(json.dumps(result, ensure_ascii=False, indent=1), encoding="utf-8")
-
-    total_rooms = sum(len(fl["rooms"]) for fl in result)
-    print(f"✓ {OUT} 생성 — {len(result)}개 층, {total_rooms}개 실")
+    print(f"✓ {OUT} 생성 — {len(result)}개 층, {sum(len(f['rooms']) for f in result)}개 실")
 
 if __name__ == "__main__":
     main()
