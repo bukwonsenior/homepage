@@ -306,10 +306,11 @@ PAGES.programs=page({
   group:'프로그램', name:'프로그램', crumb:'프로그램 › 프로그램 시간표', html:'programs.html', xlsx:'data/북원_홈페이지_프로그램관리.xlsx', sheet:'프로그램',
   nslots:20, map:PG_COLS, fixedTabs:['평생교육','동아리','특강'], tabWord:'구분', privacy:true,
   top:[
-    {k:'신청안내',label:'신청 안내 (수강신청 안내 화면)',fixed:1,cols:[{c:3,h:'항목',ro:1},{c:4,h:'내용',ta:1},{c:5,h:'설명',ro:1}],hi:'#applyBox',
+    {k:'신청안내',label:'신청 안내 (수강신청 안내 화면)',fixed:1,cols:[{c:3,h:'항목',ro:1},{c:4,h:'내용',ta:1},{c:5,h:'설명',ro:1}],hi:'#applyBox',hiKey:function(r){return 'g:'+r[3];},
       tip:'항목 이름은 바꿀 수 없어요. 날짜는 2026-08-03 처럼 · 현재상태는 신청기간중 / 신청기간아님'},
-    {k:'안내문',label:'자세한 안내 (안내문 시트)',bottom:1,cols:[{c:3,h:'제목'},{c:4,h:'내용',ta:1}],
-      tip:'※ 지금 홈페이지 화면에는 이 내용이 나오지 않아요 (엑셀 보관용).'}
+    {k:'안내문',label:'자세한 안내 (수강신청 안내 화면 맨 아래)',bottom:1,cols:[{c:3,h:'제목'},{c:4,h:'내용',ta:1}],hi:'#applyBox',
+      hiKey:function(r){return 'n:'+rows.filter(function(x){return x[2]==='안내문'&&!isX(x)&&x[3];}).indexOf(r);},
+      tip:'누르면 펼쳐지는 안내예요. 순서대로 나와요.'}
   ],
   tab:[{k:'프로그램',label:'프로그램',form:1,req:3,hi:'.hero',hiKey:function(r){return r[1]+'/'+r[3];},
     tip:'홈페이지에는 요일→시작시간 순으로 자동 정렬돼요 · 내리려면 게시를 X로',
@@ -352,6 +353,8 @@ PAGES.programs=page({
   validateRow:function(r,ln,errs,warns){
     if(r[2]==='신청안내'&&r[3]==='현재상태'&&['신청기간중','신청기간아님'].indexOf(r[4])<0)errs.push(ln+': 현재상태는 신청기간중 / 신청기간아님 중 하나여야 해요');
     if(r[2]==='신청안내'&&/일$|_시작$|_종료$|^선정발표$/.test(r[3])&&r[4]&&pgDate(r[4])==='INVALID')warns.push(ln+': '+r[3]+' 날짜는 2026-08-03 처럼 써 주세요');
+    if(r[2]==='신청안내'&&/종료/.test(r[3])){var sk=r[3].replace('종료','시작'),sr=rows.filter(function(x){return x[2]==='신청안내'&&x[3]===sk;})[0],a1=sr&&pgDate(sr[4]),a2=pgDate(r[4]);
+      if(a1&&a2&&a1!=='INVALID'&&a2!=='INVALID'&&a1>a2)warns.push(ln+': '+r[3]+'('+a2+')이 '+sk+'('+a1+')보다 빨라요');}
     if(r[2]==='안내문'&&!r[3]&&r[4])errs.push(ln+': 안내문 제목이 비어 있어요');
     if(r[2]!=='프로그램')return;
     if(P.fixedTabs.indexOf(r[1])<0)errs.push(ln+': 구분은 평생교육/동아리/특강 중 하나여야 해요 (지금: '+esc(r[1])+')');

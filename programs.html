@@ -23,7 +23,7 @@
   .apply .grid{display:flex;flex-direction:column;gap:2px;}
   .apply .it{font-size:clamp(17px,calc(15.78px + 0.31vw),19.2px);display:flex;align-items:center;gap:11px;padding:9px 0;border-bottom:1px solid #F2ECE2;}
   .apply .it:last-child{border-bottom:none;}
-  .apply .it .lbl{flex:none;width:74px;text-align:center;background:var(--soft);color:var(--action);font-weight:800;font-size:clamp(14.3px,calc(13.31px + 0.262vw),16.2px);padding:5px 0;border-radius:9px;}
+  .apply .it .lbl{flex:none;min-width:74px;white-space:nowrap;padding-left:8px!important;padding-right:8px!important;text-align:center;background:var(--soft);color:var(--action);font-weight:800;font-size:clamp(14.3px,calc(13.31px + 0.262vw),16.2px);padding:5px 0;border-radius:9px;}
   .apply .it .val{flex:1;color:var(--ink);font-weight:700;}
   .apply .note{margin-top:12px;font-size:clamp(15.9px,calc(14.79px + 0.291vw),18px);color:var(--action);font-weight:600;line-height:1.5;white-space:pre-line;background:var(--soft);border-radius:12px;padding:11px 14px;}
   .apply .subh{font-size:clamp(15.9px,calc(14.79px + 0.291vw),18px);font-weight:800;color:var(--action);margin:16px 0 9px;display:flex;align-items:center;gap:7px;}
@@ -34,10 +34,19 @@
   .apply .rules{list-style:none;display:flex;flex-direction:column;gap:8px;}
   .apply .rules li{position:relative;padding-left:20px;font-size:clamp(15.9px,calc(14.79px + 0.291vw),18px);line-height:1.55;color:#40382f;word-break:keep-all;}
   .apply .rules li::before{content:"";position:absolute;left:2px;top:8px;width:7px;height:7px;border-radius:50%;background:var(--brand);}
+.apply .more{display:flex;flex-direction:column;gap:8px;}
+  .apply .more details{background:var(--white);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);}
+  .apply .more summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 16px;font-size:clamp(15.9px,calc(14.79px + 0.291vw),18px);font-weight:800;color:var(--ink);}
+  .apply .more summary::-webkit-details-marker{display:none;}
+  .apply .more summary svg{flex:none;width:20px;height:20px;stroke:var(--brand);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;transition:transform .2s;}
+  .apply .more details[open] summary svg{transform:rotate(180deg);}
+  .apply .more .mb{padding:0 16px 15px;font-size:clamp(15.4px,calc(14.3px + 0.28vw),17.4px);line-height:1.65;color:#40382f;white-space:pre-line;word-break:keep-all;}
+  .apply .it .val a{color:var(--action);}
   .apply .fee{font-size:clamp(15.9px,calc(14.79px + 0.291vw),18px);font-weight:700;color:var(--ink);background:var(--soft);border-radius:12px;padding:11px 14px;line-height:1.55;word-break:keep-all;}
 
   .seg{display:flex;gap:8px;margin-bottom:18px;}
   .seg button{flex:1;border:1.5px solid var(--line);background:var(--white);color:var(--gray);font-size:clamp(18px,calc(16.76px + 0.33vw),20.4px);font-weight:800;padding:14px 6px;border-radius:14px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow);}
+  @media(max-width:480px){.seg{gap:6px}.seg button{font-size:15.5px;padding:12px 3px;word-break:keep-all;}}
   .seg button.on{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(243,129,0,.24);}
   .tabs{display:flex;gap:8px;margin-bottom:16px;}
   .tab{flex:1;border:1.5px solid var(--line);background:var(--white);color:var(--gray);font-size:clamp(17px,calc(15.78px + 0.31vw),19.2px);font-weight:800;padding:11px 6px;border-radius:14px;cursor:pointer;font-family:inherit;text-align:center;transition:.12s;}
@@ -102,6 +111,7 @@
   <div id="listView">
     <div class="seg" id="seg"></div>
     <div id="viewApply" class="hidden"><div class="apply" id="applyBox"></div></div>
+    <div id="viewMore" class="hidden"><div class="apply" id="moreBox"></div></div>
     <div id="viewList">
       <div class="tabs" id="tabs"></div>
       <div class="filters" id="filters"></div>
@@ -122,7 +132,8 @@
   function renderSeg(){
     var seg=document.getElementById('seg');
     seg.innerHTML='<button data-v="list"'+(topView==='list'?' class="on"':'')+'>프로그램 시간표</button>'
-      + '<button data-v="apply"'+(topView==='apply'?' class="on"':'')+'>수강신청 안내</button>';
+      + '<button data-v="apply"'+(topView==='apply'?' class="on"':'')+'>수강신청 안내</button>'
+      + '<button data-v="more"'+(topView==='more'?' class="on"':'')+'>자세한 안내</button>';
     seg.querySelectorAll('button').forEach(function(b){
       b.addEventListener('click',function(){ topView=b.dataset.v; applyTopView(); });
     });
@@ -130,6 +141,7 @@
   function applyTopView(){
     document.getElementById('viewApply').classList.toggle('hidden', topView!=='apply');
     document.getElementById('viewList').classList.toggle('hidden', topView!=='list');
+    document.getElementById('viewMore').classList.toggle('hidden', topView!=='more');
     renderSeg();
     window.scrollTo(0,0); sendHeight();
   }
@@ -141,15 +153,30 @@
   function periodRange(p){return fmtDate(p.운영시작)+(p.운영종료?' – '+fmtDate(p.운영종료):'');}
   function fmtDate(d){if(!d)return '';var m=String(d).match(/(\d{4})-(\d{2})-(\d{2})/);return m?(+m[2])+'월 '+(+m[3])+'일':d;}
 
+  var WD=['일','월','화','수','목','금','토'];
+  function fmtDateW(d){var m=String(d||'').match(/(\d{4})-(\d{2})-(\d{2})/);if(!m)return d||'';var w=new Date(+m[1],+m[2]-1,+m[3]).getDay();return (+m[2])+'월 '+(+m[3])+'일('+WD[w]+')';}
+  function range(a,b){return a||b?(fmtDateW(a)+(b?' ~ '+fmtDateW(b):'')):'';}
   function renderApply(){
     var a=DATA.신청안내||{}, box=document.getElementById('applyBox');
     var open = a.현재상태 && a.현재상태.indexOf('아님')<0;
-    var html='<span class="st '+(open?'open':'closed')+'">'+(open?'지금 신청할 수 있어요':'지금은 신청 기간이 아닙니다')+'</span>';
-    html+='<h2>수강 신청 안내</h2><div class="grid">';
-    var items=[['신청 대상',a.신청대상||'복지관 등록 회원'],['신청 방법',a.신청방법||'방문 후 키오스크 신청'],['신청 개수',a.신청개수||'1인 최대 3과목'],['선정 방법',a.선정방법||'정원 초과 시 추첨']];
-    items.forEach(function(it){ if(it[1]) html+='<div class="it"><span class="lbl">'+esc(it[0])+'</span><span class="val">'+esc(it[1])+'</span></div>'; });
+    var html='<span class="st '+(open?'open':'closed')+'" data-k="현재상태">'+(open?'지금 신청할 수 있어요':'지금은 신청 기간이 아닙니다')+'</span>';
+    html+='<h2 data-k="학기명">'+(a.학기명?esc(a.학기명)+' ':'')+'수강 신청 안내</h2><div class="grid">';
+    // [라벨, 값, 이 줄을 만드는 엑셀 항목들]
+    var items=[
+      ['신청 기간',range(a.신청시작일,a.신청종료일),'신청시작일 신청종료일'],
+      ['신청 대상',a.신청대상||'복지관 등록 회원','신청대상'],
+      ['신청 방법',a.신청방법||'방문 후 키오스크 신청','신청방법'],
+      ['신청 개수',a.신청개수||'1인 최대 3과목','신청개수'],
+      ['선정 방법',a.선정방법||'정원 초과 시 추첨','선정방법'],
+      ['선정 발표',[fmtDateW(a.선정발표),a.선정발표_시각].filter(Boolean).join(' ')+(a.선정발표_방법?' · '+a.선정발표_방법:''),'선정발표 선정발표_시각 선정발표_방법'],
+      ['수강료 납부',range(a.수강료납부_시작,a.수강료납부_종료),'수강료납부_시작 수강료납부_종료'],
+      ['교육 기간',range(a.교육기간_시작,a.교육기간_종료),'교육기간_시작 교육기간_종료']
+    ];
+    items.forEach(function(it){ if(it[1]) html+='<div class="it" data-k="'+it[2]+'"><span class="lbl">'+esc(it[0])+'</span><span class="val">'+esc(it[1])+'</span></div>'; });
+    var tel=a.문의전화||DATA.문의전화;
+    if(tel) html+='<div class="it" data-k="문의전화"><span class="lbl">문의</span><span class="val">'+telLink(tel)+'</span></div>';
     html+='</div>';
-    if(!open && a.신청기간아닐때_문구) html+='<div class="note">'+esc(a.신청기간아닐때_문구)+'</div>';
+    if(!open && a.신청기간아닐때_문구) html+='<div class="note" data-k="신청기간아닐때_문구">'+esc(a.신청기간아닐때_문구)+'</div>';
 
     // 이용 절차 (고정)
     var proc=['복지관 회원 가입','수강 신청(방문)','선정 여부 확인','프로그램 참여'];
@@ -175,6 +202,14 @@
       + '</ul>';
 
     box.innerHTML=html;
+
+    // 자세한 안내 (엑셀 '안내문' 시트) — 별도 화면, 한 번에 하나만 펼침
+    var notes=DATA.안내문||[], mb=document.getElementById('moreBox');
+    mb.innerHTML=notes.length?'<div class="more">'
+        + notes.map(function(n,i){ return '<details data-n="'+i+'"><summary>'+esc(n.제목)+'<svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg></summary><div class="mb">'+esc(n.내용)+'</div></details>'; }).join('')
+        + '</div>':'<div class="empty">등록된 안내가 없습니다.</div>';
+    var ds=mb.querySelectorAll('details');
+    ds.forEach(function(d){ d.addEventListener('toggle',function(){ if(d.open) ds.forEach(function(o){ if(o!==d) o.open=false; }); sendHeight(); }); });
   }
 
   function renderTabs(){
@@ -234,7 +269,7 @@
         + '<div class="pfee'+(paid?' paid':'')+'">'+esc(p.수강료표시||'무료')+'</div>'
         + '</div>';
     }).join('');
-    el.querySelectorAll('.pcard').forEach(function(c){ c.addEventListener('click',function(){location.hash='p/'+c.dataset.id;}); });
+    el.querySelectorAll('.pcard').forEach(function(c){ c.addEventListener('click',function(){ openP(c.dataset.id); }); });
     // 페이지 넘김 버튼 (2쪽 이상일 때만)
     if(totalPages>1){
       pg.innerHTML='<button id="pgPrev"'+(curPage<=1?' disabled':'')+'><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>이전</button>'
@@ -254,7 +289,7 @@
     var paid=(p.수강료||0)>0;
     var hero=p.사진?' style="background-image:url('+esc(p.사진)+')"':'';
     var h='';
-    h+='<div class="top"><div class="back" onclick="history.back()"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="t">프로그램 안내</div></div>';
+    h+='<div class="top"><div class="back" id="pBack"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="t">프로그램 안내</div></div>';
     h+='<div class="hero"'+hero+'><div class="cap"><span class="b cat">'+esc(p.구분)+'</span>'
       + (p.분류?'<span class="b sub">'+esc(p.분류)+'</span>':'')
       + '<div class="nm">'+esc(p.이름)+'</div></div></div>';
@@ -277,11 +312,16 @@
     h+='<div class="callnote">이 프로그램이 궁금하시면<br>전화로 물어보세요.</div>';
     h+='<a class="call" href="tel:'+esc(tel).replace(/[^0-9]/g,'')+'"><svg viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 01-2.2 2 19.8 19.8 0 01-8.6-3.1 19.5 19.5 0 01-6-6A19.8 19.8 0 012 4.2 2 2 0 014 2h3a2 2 0 012 1.7c.1.9.3 1.8.6 2.6a2 2 0 01-.5 2.1L8 9.6a16 16 0 006 6l1.2-1.1a2 2 0 012.1-.5c.8.3 1.7.5 2.6.6A2 2 0 0122 16.9z"/></svg>'+esc(tel)+'</a>';
     document.getElementById('detailView').innerHTML=h;
+    document.getElementById('pBack').onclick=function(){ if(INLINE){ showList(); } else history.back(); };
     sendHeight();
   }
   function row(k,v){return '<div class="row"><div class="k">'+k+'</div><div class="v">'+(v||'-')+'</div></div>';}
   function step(n,t,p){return '<div class="step"><div class="num">'+n+'</div><div><b>'+t+'</b><p>'+p+'</p></div></div>';}
 
+  var INLINE=location.protocol==='about:';   // 편집기 미리보기 안에서는 주소(#) 이동이 안 돼서 직접 화면 전환
+  function openP(id){ if(INLINE){ showDetail(id); } else location.hash='p/'+id; }
+  function showDetail(id){ document.getElementById('listView').classList.add('hidden'); document.getElementById('detailView').classList.remove('hidden'); renderDetail(id); window.scrollTo(0,0); }
+  function showList(){ document.getElementById('detailView').classList.add('hidden'); document.getElementById('listView').classList.remove('hidden'); sendHeight(); }
   function route(){
     var h=location.hash.replace(/^#/,'');
     var lv=document.getElementById('listView'), dv=document.getElementById('detailView');
@@ -310,6 +350,12 @@
     if(!DATA) return true;
     var lv=document.getElementById('listView'), dv=document.getElementById('detailView');
     function mark(el){ if(el){ el.classList.add('bwhi'); el.scrollIntoView({block:'center'}); } }
+    if(m.key&&/^[gn]:/.test(m.key)){
+      dv.classList.add('hidden'); lv.classList.remove('hidden'); topView=m.key[0]==='g'?'apply':'more'; applyTopView();
+      var k=m.key.slice(2), el=m.key[0]==='g'?document.querySelector('#applyBox [data-k~="'+k+'"]'):document.querySelector('#moreBox details[data-n="'+k+'"]');
+      if(el&&el.tagName==='DETAILS') el.open=true;
+      mark(el||document.getElementById(m.key[0]==='g'?'applyBox':'moreBox')); sendHeight(); return true;
+    }
     if(m.key){
       if(DATA.프로그램.some(function(x){return x.id===m.key;})){
         lv.classList.add('hidden'); dv.classList.remove('hidden'); renderDetail(m.key); mark(dv.querySelector('.hero')); return true;
