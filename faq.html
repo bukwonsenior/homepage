@@ -83,8 +83,21 @@
     });
   }
 
-  function render(j){
-    DATA={categories:j.categories||[],items:j.items||[]};
+  // 프로그램 엑셀의 '안내' 시트(programs.json 안내문)를 '프로그램' 분류에 자동으로 덧붙임 → 한 곳만 고치면 두 화면에 반영
+  var BASE={categories:[],items:[]}, EXTRA=[], EXTRA_CAT='프로그램';
+  function render(j){ BASE={categories:j.categories||[],items:j.items||[]}; draw(); }
+  fetch('data/programs.json?t='+Date.now()).then(function(r){return r.json();}).then(function(p){
+    EXTRA=(p.안내문||[]).filter(function(n){return n.제목;}).map(function(n){return {cat:EXTRA_CAT,q:n.제목,a:n.내용||''};});
+    if(EXTRA.length) draw();
+  }).catch(function(){});
+  function draw(){
+    var items=BASE.items.slice(), cats=BASE.categories.slice();
+    if(EXTRA.length){
+      if(cats.indexOf(EXTRA_CAT)<0) cats.splice(Math.min(1,cats.length),0,EXTRA_CAT);
+      var last=-1; items.forEach(function(it,i){ if(it.cat===EXTRA_CAT) last=i; });
+      var at=last>=0?last+1:items.length; Array.prototype.splice.apply(items,[at,0].concat(EXTRA));
+    }
+    DATA={categories:cats,items:items};
     if(curCat>=DATA.categories.length) curCat=0;
     document.getElementById('cats').innerHTML=DATA.categories.map(function(c,i){
       return '<button class="cat'+(i===curCat?' on':'')+'" data-v="'+i+'">'+esc(c)+'</button>';

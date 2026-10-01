@@ -249,7 +249,7 @@ function saeopBuild(rows,url){
 PAGES.faq=page({
   group:'이용안내', name:'자주 묻는 질문', crumb:'이용안내 › 자주 묻는 질문', html:'faq.html', xlsx:'data/자주묻는질문.xlsx', sheet:'FAQ',
   map:[['게시',0],['분류',1],['질문',3],['답변',4]], headKey:'질문', fixedKind:'질문', tabWord:'분류',
-  tab:[{k:'질문',label:'질문과 답변',req:3,cols:[{c:3,h:'질문'},{c:4,h:'답변',ta:1}],hi:'.qa',tip:'답변 안의 전화번호(033-…)는 홈페이지에서 누르면 바로 전화가 걸려요. 엔터로 줄바꿈하면 화면에서도 줄이 바뀌어요.'}],
+  tab:[{k:'질문',label:'질문과 답변',req:3,cols:[{c:3,h:'질문'},{c:4,h:'답변',ta:1}],hi:'.qa',tip:'답변 안의 전화번호(033-…)는 누르면 바로 전화가 걸려요. ※ 프로그램 분류 아래에는 프로그램 편집기의 [문의사항] 항목이 자동으로 덧붙어 나와요(편집기 미리보기에는 안 보일 수 있어요).'}],
   guide:['■ 한 줄 = 질문 하나. 분류 = 화면 위쪽 분류 버튼(나온 순서대로)','■ 답변 안 줄바꿈(Alt+Enter)은 화면에서도 줄바꿈됩니다.','■ 게시: O=보임 / X=숨김'],
   build:function(rows){
     var cats=[],items=[];
@@ -308,9 +308,9 @@ PAGES.programs=page({
   top:[
     {k:'신청안내',label:'신청 안내 (수강신청 안내 화면)',fixed:1,cols:[{c:3,h:'항목',ro:1},{c:4,h:'내용',ta:1},{c:5,h:'설명',ro:1}],hi:'#applyBox',hiKey:function(r){return 'g:'+r[3];},
       tip:'항목 이름은 바꿀 수 없어요. 날짜는 2026-08-03 처럼 · 현재상태는 신청기간중 / 신청기간아님'},
-    {k:'안내문',label:'자세한 안내 (수강신청 안내 화면 맨 아래)',bottom:1,cols:[{c:3,h:'제목'},{c:4,h:'내용',ta:1}],hi:'#applyBox',
+    {k:'안내문',label:'문의사항 (프로그램 [문의사항] 화면 + 자주 묻는 질문)',bottom:1,cols:[{c:3,h:'제목'},{c:4,h:'내용',ta:1}],hi:'#applyBox',
       hiKey:function(r){return 'n:'+rows.filter(function(x){return x[2]==='안내문'&&!isX(x)&&x[3];}).indexOf(r);},
-      tip:'누르면 펼쳐지는 안내예요. 순서대로 나와요.'}
+      tip:'누르면 펼쳐지는 안내예요. 자주 묻는 질문 › 프로그램에도 자동으로 함께 나와요 → 제목은 질문 형태로 써 주세요.'}
   ],
   tab:[{k:'프로그램',label:'프로그램',form:1,req:3,hi:'.hero',hiKey:function(r){return r[1]+'/'+r[3];},
     tip:'홈페이지에는 요일→시작시간 순으로 자동 정렬돼요 · 내리려면 게시를 X로',
