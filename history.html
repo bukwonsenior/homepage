@@ -28,6 +28,7 @@
   .ev::before{content:"";position:absolute;left:-19px;top:15px;width:14px;height:14px;border-radius:50%;background:#fff;border:3px solid var(--brand);box-sizing:border-box;}
   .ev .d{flex:none;width:66px;font-size:clamp(16.4px,calc(15.28px + 0.301vw),18.6px);font-weight:800;color:var(--action);padding-top:1px;letter-spacing:-.3px;}
   .ev .c{flex:1;font-size:clamp(17px,calc(15.78px + 0.31vw),19.2px);font-weight:600;line-height:1.55;color:#3c342d;word-break:keep-all;padding-top:1px;}
+  .hidden{display:none!important;}
   .none{color:var(--gray);font-size:clamp(17px,calc(15.78px + 0.31vw),19.2px);padding:30px 0;}
   @media (min-width:480px){
     .tab{font-size:clamp(18px,calc(16.76px + 0.33vw),20.4px);}
@@ -39,46 +40,45 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="tabs" id="tabs"></div>
-  <div class="tl" id="tl"></div>
+  <div class="tabs seg" id="tabs"></div>
+  <div id="tl"></div>
 </div>
 <script>
 (function(){
-  var DATA=null, cur=0;
+  // 편집기 규약: 연도그룹마다 .tabpanel#tp{i}, 탭 버튼 = .seg button[data-v], 불러오기 = BW_LOAD 마커
+  var cur=null;
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function param(k){var m=new RegExp('[?&]'+k+'=([^&]+)').exec(location.search);return m?decodeURIComponent(m[1]):null;}
 
-  function renderTabs(){
-    document.getElementById('tabs').innerHTML=DATA.그룹.map(function(g,i){
-      return '<button class="tab'+(i===cur?' on':'')+'" data-i="'+i+'">'+esc(g.이름)+'</button>';
+  function render(j){
+    var G=(j&&j.그룹)||[], tl=document.getElementById('tl');
+    if(!G.length){ document.getElementById('tabs').innerHTML=''; tl.innerHTML='<div class="none">연혁을 불러오지 못했습니다.</div>'; sendHeight(); return; }
+    if(cur==null){ cur=0; var tp=param('tab'); if(tp){ G.forEach(function(g,i){ if(g.이름===tp) cur=i; }); } }
+    if(cur>=G.length) cur=0;
+    document.getElementById('tabs').innerHTML=G.map(function(g,i){
+      return '<button class="tab'+(i===cur?' on':'')+'" data-v="'+i+'">'+esc(g.이름)+'</button>';
     }).join('');
-    document.querySelectorAll('.tab').forEach(function(b){
-      b.addEventListener('click',function(){ cur=+b.dataset.i; render(); window.scrollTo(0,0); });
-    });
-  }
-  function render(){
-    renderTabs();
-    var g=DATA.그룹[cur], tl=document.getElementById('tl');
-    var items=(g&&g.항목)||[];
-    if(!items.length){ tl.innerHTML='<div class="none">등록된 연혁이 없습니다.</div>'; sendHeight(); return; }
-    var h='', lastYear=null;
-    items.forEach(function(it){
-      if(it.연도 && it.연도!==lastYear){
-        h+='<div class="yr"><span class="n">'+esc(it.연도)+'</span></div>';
-        lastYear=it.연도;
-      }
-      h+='<div class="ev"><div class="d">'+esc(it.날짜||'')+'</div><div class="c">'+esc(it.내용)+'</div></div>';
-    });
-    tl.innerHTML=h;
+    tl.innerHTML=G.map(function(g,i){
+      var items=g.항목||[], h='', lastYear=null;
+      if(!items.length) h='<div class="none">등록된 연혁이 없습니다.</div>';
+      items.forEach(function(it){
+        if(it.연도 && it.연도!==lastYear){ h+='<div class="yr"><span class="n">'+esc(it.연도)+'</span></div>'; lastYear=it.연도; }
+        h+='<div class="ev"><div class="d">'+esc(it.날짜||'')+'</div><div class="c">'+esc(it.내용)+'</div></div>';
+      });
+      return '<div class="tabpanel tl'+(i===cur?'':' hidden')+'" id="tp'+i+'">'+h+'</div>';
+    }).join('');
     sendHeight();
   }
+  document.getElementById('tabs').addEventListener('click',function(e){
+    var b=e.target.closest('.tab'); if(!b) return;
+    cur=+b.dataset.v;
+    document.querySelectorAll('#tabs .tab').forEach(function(x,j){ x.classList.toggle('on',j===cur); });
+    document.querySelectorAll('#tl .tabpanel').forEach(function(p,j){ p.classList.toggle('hidden',j!==cur); });
+    window.scrollTo(0,0); sendHeight();
+  });
 
-  fetch('data/history.json?t='+Date.now()).then(function(r){return r.json();}).then(function(j){
-    DATA=j;
-    if(!DATA.그룹||!DATA.그룹.length){ document.getElementById('tl').innerHTML='<div class="none">연혁을 불러오지 못했습니다.</div>'; return; }
-    var tp=param('tab'); if(tp){ DATA.그룹.forEach(function(g,i){ if(g.이름===tp) cur=i; }); }
-    render();
-  }).catch(function(){ document.getElementById('tl').innerHTML='<div class="none">연혁을 불러오지 못했습니다.</div>'; });
+  /*BW_LOAD*/fetch('data/history.json?t='+Date.now()).then(function(r){return r.json();}).then(render)
+    .catch(function(){ document.getElementById('tl').innerHTML='<div class="none">연혁을 불러오지 못했습니다.</div>'; });/*BW_LOAD_END*/
 
   function sendHeight(){ try{var h=Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height)+12; parent.postMessage({bwHistory:'height',height:h},'*'); }catch(e){} }
   window.addEventListener('load',sendHeight); window.addEventListener('resize',sendHeight);

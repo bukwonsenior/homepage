@@ -127,7 +127,7 @@ var ICON_KO={phone:'전화',home:'방문',meal:'식사',talk:'상담',user:'사�
 var COLOR={소개:'#E8833A',신청:'#2E8B77',계좌:'#2E8B77',예금주:'#8a7a66',문의:'#2E8B77',안내:'#D9483B',카드:'#3A7BD5',절차:'#7C6BD6',절차제목:'#7C6BD6',혜택:'#D98324',사진:'#8B5CF6',부제:'#2E8B77',설명:'#E8833A',정보:'#3A7BD5',내용제목:'#D98324',내용:'#D98324'};
 // 내부 행 칸: 0게시 1탭 2종류 3이름/라벨 4내용 5태그·전화 6아이콘 7사진 8캡션 9~ 페이지별 추가칸
 var STD_MAP=[['게시',0],['탭',1],['종류',2],['이름·라벨',3,['이름/라벨']],['내용',4],['태그',5],['아이콘',6],['사진',7],['캡션',8]];
-function page(o){return Object.assign({map:STD_MAP,nslots:9,photo:{file:7,cap:8},top:[],fileFields:[],privacy:false},o);}
+function page(o){return Object.assign({map:STD_MAP,nslots:9,photo:{file:7,cap:8},top:[],fileFields:[],privacy:false,headKey:'종류',tabWord:'탭'},o);}
 function isX(r){return String(r[0]).toUpperCase()==='X'||r[0]==='×';}
 function tabObj(m,o,n,init){if(!m[n]){m[n]=Object.assign({이름:n},JSON.parse(JSON.stringify(init)));o.push(n);}return m[n];}
 
@@ -243,6 +243,30 @@ function saeopBuild(rows,url){
   });
 });
 
+/* ---- 자주 묻는 질문 / 연혁: 종류 칸이 없는 엑셀 → 모든 줄을 한 종류(fixedKind)로 취급 ---- */
+PAGES.faq=page({
+  group:'이용안내', name:'자주 묻는 질문', crumb:'이용안내 › 자주 묻는 질문', html:'faq.html', xlsx:'data/자주묻는질문.xlsx', sheet:'FAQ',
+  map:[['게시',0],['분류',1],['질문',3],['답변',4]], headKey:'질문', fixedKind:'질문', tabWord:'분류',
+  tab:[{k:'질문',label:'질문과 답변',req:3,cols:[{c:3,h:'질문'},{c:4,h:'답변',ta:1}],hi:'.qa',tip:'답변 안의 전화번호(033-…)는 홈페이지에서 누르면 바로 전화가 걸려요. 엔터로 줄바꿈하면 화면에서도 줄이 바뀌어요.'}],
+  guide:['■ 한 줄 = 질문 하나. 분류 = 화면 위쪽 분류 버튼(나온 순서대로)','■ 답변 안 줄바꿈(Alt+Enter)은 화면에서도 줄바꿈됩니다.','■ 게시: O=보임 / X=숨김'],
+  build:function(rows){
+    var cats=[],items=[];
+    rows.forEach(function(r){ if(isX(r)||!r[3])return; var c=r[1]||'기타'; if(r[1]&&cats.indexOf(c)<0)cats.push(c); items.push({cat:c,q:r[3],a:r[4]}); });
+    return {categories:cats,items:items,탭:cats.map(function(c){return {이름:c};})};
+  }
+});
+PAGES.history=page({
+  group:'기관소개', name:'연혁', crumb:'기관소개 › 연혁', html:'history.html', xlsx:'data/연혁.xlsx', sheet:'연혁',
+  map:[['게시',0],['연도그룹',1],['연도',3],['날짜',5],['내용',4]], headKey:'연도그룹', fixedKind:'항목', tabWord:'연도 탭', carry:[3],
+  tab:[{k:'항목',label:'연혁 항목',req:4,cols:[{c:3,h:'연도'},{c:5,h:'날짜 (01.15)'},{c:4,h:'내용',ta:1}],hi:'.ev',tip:'같은 연도끼리 날짜 순으로 · 연도가 바뀌는 줄에서 큰 연도 글씨가 새로 나와요 · 새 해는 [+ 연도 탭 추가] 후 맨 앞으로 끌어 옮기세요'}],
+  guide:['■ 한 줄 = 연혁 한 항목. 연도그룹 = 화면 위쪽 탭(나온 순서대로)','■ 날짜는 01.15 처럼 월.일로 씁니다.','■ 게시: O=보임 / X=숨김'],
+  build:function(rows){
+    var G=[],m={};
+    rows.forEach(function(r){ if(isX(r)||!r[1]||!r[4])return; if(!m[r[1]]){m[r[1]]={이름:r[1],항목:[]};G.push(m[r[1]]);} m[r[1]].항목.push({연도:r[3],날짜:r[5],내용:r[4]}); });
+    return {그룹:G,탭:G};
+  }
+});
+
 /* ================= 상태 ================= */
 var P=null,pageKey=null,rows=[],tpl=null,tplOld=false,dev='pc',curTab='',lastHi=null,dirty=false;
 var blobs=new Map(), heights=[], renderTimer=null, lastDoc=null;
@@ -283,7 +307,7 @@ function loadTemplate(){
   var want=pageKey;
   fetch(RAW+P.html+'?t='+Date.now()).then(function(r){if(!r.ok)throw 0;return r.text();}).then(function(t){
     if(want!==pageKey)return;
-    tplOld=!(/tabpanel/.test(t)&&/var IMG_BASE=/.test(t));
+    tplOld=!/tabpanel/.test(t)||(!!P.img&&!/var IMG_BASE=/.test(t));
     var LOAD="setTimeout(function(){try{render(window.__BW__||{});}catch(e){document.getElementById('app').innerHTML='<div class=\"none\">미리보기 오류: '+e.message+'</div>';}},0);";
     if(/\/\*BW_LOAD\*\/[\s\S]*?\/\*BW_LOAD_END\*\//.test(t)) t=t.replace(/\/\*BW_LOAD\*\/[\s\S]*?\/\*BW_LOAD_END\*\//,function(){return LOAD;});
     else t=t.replace(/fetch\('data\/[^']+\.json[\s\S]*?불러오지 못했습니다[\s\S]*?\}\);/,function(){return LOAD;});
@@ -298,8 +322,8 @@ function readWorkbook(buf,from){
   var wb=XLSX.read(new Uint8Array(buf),{type:'array'});
   var ws=wb.Sheets[P.sheet]||wb.Sheets[wb.SheetNames.filter(function(n){return n!=='사용법';})[0]];
   var aoa=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-  var hi=aoa.findIndex(function(r){var m=r.map(function(x){return String(x).trim();});return m.indexOf('종류')>=0&&m.indexOf('게시')>=0;});
-  if(hi<0){alert('엑셀에서 머리글(게시·종류…) 줄을 찾지 못했어요. '+P.name+' 페이지 엑셀이 맞는지 확인해 주세요.');return;}
+  var hi=aoa.findIndex(function(r){var m=r.map(function(x){return String(x).trim();});return m.indexOf(P.headKey)>=0&&m.indexOf('게시')>=0;});
+  if(hi<0){alert('엑셀에서 머리글(게시·'+P.headKey+'…) 줄을 찾지 못했어요. '+P.name+' 페이지 엑셀이 맞는지 확인해 주세요.');return;}
   var H=aoa[hi].map(function(x){return String(x).trim();});
   var col=P.map.map(function(m){var names=[m[0]].concat(m[2]||[]);for(var i=0;i<names.length;i++){var j=H.indexOf(names[i]);if(j>=0)return j;}return -1;});
   var old=!!P.migrate&&H.indexOf('탭')<0, out=[];
@@ -308,6 +332,7 @@ function readWorkbook(buf,from){
     var r=[];for(var s=0;s<P.nslots;s++)r.push('');
     P.map.forEach(function(m,j){if(col[j]>=0&&row[col[j]]!=null)r[m[1]]=String(row[col[j]]).trim();});
     if(!r[0])r[0]='O';
+    if(P.fixedKind)r[2]=P.fixedKind;
     if(old&&P.migrate[r[2]]){r[1]=P.migrate[r[2]][0];r[2]=P.migrate[r[2]][1];}
     out.push(r);
   }
@@ -338,11 +363,11 @@ function buildEditor(){
   }
   var topUp=P.top.filter(function(s){return !s.bottom;}), topDn=P.top.filter(function(s){return s.bottom;});
   if(topUp.length){h+='<div class="area">페이지 공통 · 위쪽</div>';topUp.forEach(function(s){h+=group(s,'top','');});}
-  h+='<div class="area">탭 ('+tabs.length+'개)</div><div class="tabbar" id="tabbar"><span class="lbl">탭</span>';
-  tabs.forEach(function(t){h+='<div class="chip'+(t===curTab?' on':'')+'" draggable="true" data-t="'+esc(t)+'">'+esc(t)+'<span class="x" title="탭 삭제" data-del="1">&times;</span></div>';});
-  h+='<div class="addtab" id="addtab">+ 탭 추가</div><div class="tabtip">클릭=선택 · 더블클릭=이름 바꾸기 · 끌어서 순서 변경 · ×=탭 삭제</div></div>';
+  var TW=P.tabWord;h+='<div class="area">'+TW+' ('+tabs.length+'개)</div><div class="tabbar" id="tabbar"><span class="lbl">'+TW+'</span>';
+  tabs.forEach(function(t){h+='<div class="chip'+(t===curTab?' on':'')+'" draggable="true" data-t="'+esc(t)+'">'+esc(t)+'<span class="x" title="'+TW+' 삭제" data-del="1">&times;</span></div>';});
+  h+='<div class="addtab" id="addtab">+ '+TW+' 추가</div><div class="tabtip">클릭=선택 · 더블클릭=이름 바꾸기 · 끌어서 순서 변경 · ×=삭제</div></div>';
   if(curTab)P.tab.forEach(function(s){h+=group(s,'tab',curTab);});
-  else h+='<div class="empty" style="padding:24px">아직 탭이 없어요. <b>[+ 탭 추가]</b>로 만들어 주세요.</div>';
+  else h+='<div class="empty" style="padding:24px">아직 '+P.tabWord+'이(가) 없어요. <b>[+ '+P.tabWord+' 추가]</b>로 만들어 주세요.</div>';
   if(topDn.length){h+='<div class="area">페이지 공통 · 아래쪽</div>';topDn.forEach(function(s){h+=group(s,'top','');});}
   document.getElementById('editor').innerHTML=h;
   bindTabbar();
@@ -393,6 +418,7 @@ function addRow(k,tab){
   var r=blank(tab,k), at=-1;
   rows.forEach(function(x,i){if(x[2]===k&&(x[1]||'')===(tab||''))at=i;});
   if(at<0&&tab)rows.forEach(function(x,i){if(x[1]===tab)at=i;});
+  if(at>=0&&P.carry&&rows[at][1]===(tab||''))P.carry.forEach(function(c){r[c]=rows[at][c];});
   if(at<0)rows.push(r);else rows.splice(at+1,0,r);
   mark();buildEditor();render(true);
   setTimeout(function(){var el=document.querySelector('tr[data-i="'+rows.indexOf(r)+'"] input,tr[data-i="'+rows.indexOf(r)+'"] textarea');if(el)el.focus();},30);
@@ -406,7 +432,7 @@ function rowOver(e,i){if(dragRow==null||!same(dragRow,i))return;e.preventDefault
 function rowDrop(e,i){e.preventDefault();var s=dragRow;rowEnd();if(s==null||s===i||!same(s,i))return;var tgt=rows[i],it=rows[s];rows.splice(s,1);rows.splice(rows.indexOf(tgt),0,it);mark();buildEditor();render(true);}
 function movePhoto(i,d){var r=rows[i],sib=[];rows.forEach(function(x,j){if(x[2]==='사진'&&x[1]===r[1])sib.push(j);});var p=sib.indexOf(i),q=p+d;if(q<0||q>=sib.length)return;var j=sib[q];rows[i]=rows[j];rows[j]=r;mark();buildEditor();render(true);}
 function addPhotos(files){
-  if(!curTab){alert('먼저 탭을 선택하거나 만들어 주세요.');return;}
+  if(!curTab){alert('먼저 '+P.tabWord+'을(를) 선택하거나 만들어 주세요.');return;}
   var at=-1;rows.forEach(function(x,i){if(x[1]===curTab)at=i;});
   for(var n=0;n<files.length;n++){
     var f=files[n],name=f.name.replace(/\s+/g,'_');
@@ -434,18 +460,18 @@ function bindTabbar(){
 }
 function selectTab(t){curTab=t;buildEditor();render(true);lastHi={tab:rendered().indexOf(t),sel:'.sec,h1',pos:0};post(lastHi);}
 function addTab(){
-  var n=prompt('새 탭 이름을 적어 주세요.');if(!n||!n.trim())return;n=n.trim();
-  if(tabNames().indexOf(n)>=0){alert('이미 있는 탭 이름이에요.');return;}
+  var n=prompt('새 '+P.tabWord+' 이름을 적어 주세요.');if(!n||!n.trim())return;n=n.trim();
+  if(tabNames().indexOf(n)>=0){alert('이미 있는 이름이에요.');return;}
   rows.push(blank(n,P.newTabKind||P.tab[0].k));curTab=n;mark();buildEditor();render(true);
 }
 function renameTab(o){
-  var n=prompt('탭 이름을 바꿔 주세요.'+(P.renameNote?'\n'+P.renameNote:''),o);if(!n||!n.trim()||n.trim()===o)return;n=n.trim();
-  if(tabNames().indexOf(n)>=0){alert('이미 있는 탭 이름이에요.');return;}
+  var n=prompt(P.tabWord+' 이름을 바꿔 주세요.'+(P.renameNote?'\n'+P.renameNote:''),o);if(!n||!n.trim()||n.trim()===o)return;n=n.trim();
+  if(tabNames().indexOf(n)>=0){alert('이미 있는 이름이에요.');return;}
   rows.forEach(function(r){if(r[1]===o)r[1]=n;});if(curTab===o)curTab=n;mark();buildEditor();render(true);
 }
 function delTab(t){
   var cnt=rows.filter(function(r){return r[1]===t;}).length;
-  if(!confirm('"'+t+'" 탭과 그 안의 내용 '+cnt+'줄을 모두 지울까요?'))return;
+  if(!confirm('"'+t+'" '+P.tabWord+'과(와) 그 안의 내용 '+cnt+'줄을 모두 지울까요?'))return;
   rows=rows.filter(function(r){if(r[1]===t&&blobs.get(r)){URL.revokeObjectURL(blobs.get(r));blobs.delete(r);}return r[1]!==t;});
   if(curTab===t)curTab='';mark();buildEditor();render(true);
 }
@@ -473,7 +499,7 @@ function validate(){
     var ln='엑셀 '+(i+5)+'행',k=r[2];
     if(!k){errs.push(ln+': 종류가 비었어요');return;}
     if(all.indexOf(k)<0){errs.push(ln+': 종류 "'+esc(k)+'"는 이 페이지에서 쓸 수 없어요 ('+all.join('·')+')');return;}
-    if(!r[1]&&top.indexOf(k)<0){errs.push(ln+': '+k+'는 탭 안에 들어가는 항목이라 탭 이름이 필요해요');return;}
+    if(!r[1]&&top.indexOf(k)<0){errs.push(ln+': '+P.tabWord+' 칸이 비어 있어요');return;}
     if(r[1]&&tab.indexOf(k)<0){errs.push(ln+': '+k+'는 페이지 공통 항목이라 탭 칸을 비워야 해요');return;}
     if(r[6]&&!ICONS[r[6]])errs.push(ln+': 아이콘 "'+esc(r[6])+'"는 목록에 없어요');
     P.fileFields.forEach(function(f){if(f.fill&&!r[f.slot])errs.push(ln+': '+f.h+' 칸이 비어 있어요');});
@@ -507,7 +533,7 @@ function doRender(){
    +'function tab(i){if(i==null||i<0)return;var p=document.getElementById("tp"+i);if(p&&p.classList.contains("hidden")){var b=document.querySelectorAll(".seg button")[i];if(b)b.click();}}'
    +'function hi(m){if(!m)return;setTimeout(function(){tab(m.tab);document.querySelectorAll(".bwhi").forEach(function(x){x.classList.remove("bwhi");});'
    +'var root=(m.tab!=null&&m.tab>=0)?document.getElementById("tp"+m.tab):document;if(!root)return;var el=root.querySelectorAll(m.sel)[m.pos||0];'
-   +'if(el){el.classList.add("bwhi");el.scrollIntoView({block:"center",behavior:"smooth"});}},70);}'
+   +'if(el){if(el.tagName==="DETAILS")el.open=true;el.classList.add("bwhi");el.scrollIntoView({block:"center",behavior:"smooth"});}},70);}'
    +'function hs(){var ps=[].slice.call(document.querySelectorAll(".tabpanel")),w=document.querySelector(".wrap");if(!w)return;var cur=ps.findIndex(function(p){return !p.classList.contains("hidden");}),out=[];'
    +'if(!ps.length)out.push(Math.ceil(w.getBoundingClientRect().height)+12);else{ps.forEach(function(p,i){ps.forEach(function(q,j){q.classList.toggle("hidden",j!==i);});out.push(Math.ceil(w.getBoundingClientRect().height)+12);});ps.forEach(function(q,j){q.classList.toggle("hidden",j!==cur);});}'
    +'parent.postMessage({bwH:out,cur:Math.ceil(w.getBoundingClientRect().height)+20},"*");}'
@@ -550,7 +576,7 @@ document.getElementById('dl').addEventListener('click',function(){
   var aoa=[[P.name+' 페이지 내용  —  한 줄 = 화면의 한 조각'],['"홈페이지 편집기"로 고친 파일입니다. 편집기로 여는 것을 권장합니다.'],[],HEAD]
     .concat(rows.map(function(r){return P.map.map(function(m){var v=r[m[1]];return v==null?'':v;});}));
   var ws=XLSX.utils.aoa_to_sheet(aoa);ws['!cols']=HEAD.map(function(h){return{wch:/내용|설명/.test(h)?60:(/탭|라벨|이름|소제목/.test(h)?22:12)};});
-  var g=[['북원노인종합복지관 · '+P.name+' 페이지 관리표'],['이 파일은 "홈페이지 편집기"로 편집하는 것을 권장합니다.'],[],
+  var g=P.guide?[['북원노인종합복지관 · '+P.name+' 페이지 관리표'],['이 파일은 "홈페이지 편집기"로 편집하는 것을 권장합니다.'],[]].concat(P.guide.map(function(x){return [x];})):[['북원노인종합복지관 · '+P.name+' 페이지 관리표'],['이 파일은 "홈페이지 편집기"로 편집하는 것을 권장합니다.'],[],
     ['■ 종류'+(P.top.length?'(탭 비움): '+kindsOf('top').join(' · '):': ')+(P.top.length?'':kindsOf('tab').join(' · '))],
     P.top.length?['■ 종류(탭 있음): '+kindsOf('tab').join(' · ')]:['■ 모든 줄에 탭 이름이 필요합니다.'],
     ['■ 사진 파일은 GitHub '+P.img+' 폴더에 같은 이름으로 올립니다.'],['■ 아이콘: '+Object.keys(ICONS).join(' ')],['■ 게시: O=보임 / X=숨김']];

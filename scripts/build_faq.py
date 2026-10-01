@@ -2,7 +2,7 @@
 """
 data/자주묻는질문.xlsx -> data/faq.json
 시트 'FAQ', 4행 머리글(게시/분류/질문/답변), 5행부터.
-분류: 이용·회원 / 프로그램 / 식사 / 후원 / 자원봉사 / 기타
+분류 버튼 순서 = 엑셀(편집기)에서 분류가 처음 나온 순서
 답변 안에서 줄바꿈(엔터)은 화면에서도 줄바꿈으로 표시됩니다.
 """
 import json, sys
@@ -12,7 +12,6 @@ import openpyxl
 
 SRC=Path("data/자주묻는질문.xlsx"); OUT=Path("data/faq.json")
 KST=timezone(timedelta(hours=9)); SHEET="FAQ"
-ORDER=["이용·회원","프로그램","식사","후원","자원봉사","기타"]
 def s(v): return "" if v is None else str(v).strip()
 
 def main():
@@ -41,7 +40,7 @@ def main():
         items.append({"cat":cat or "기타","q":q,"a":a})
     if not items:
         print("::error::게시할 질문이 한 건도 없습니다."); sys.exit(1)
-    cat_sorted=[c for c in ORDER if c in cats]+[c for c in cats if c not in ORDER]
+    cat_sorted=cats   # 나온 순서 그대로 (편집기에서 분류를 끌어 옮기면 화면 순서도 바뀜)
     doc={"생성시각":datetime.now(KST).isoformat(timespec="seconds"),"출처":SRC.name,
          "categories":cat_sorted,"items":items}
     OUT.write_text(json.dumps(doc,ensure_ascii=False,indent=1),encoding="utf-8")
