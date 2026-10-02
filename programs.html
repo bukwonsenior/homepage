@@ -88,6 +88,8 @@
   .back svg{width:22px;height:22px;stroke:var(--ink);fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round;}
   .top .t{font-size:clamp(21.2px,calc(19.72px + 0.388vw),24px);font-weight:800;}
   .hero{position:relative;height:200px;border-radius:20px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:16px;background:linear-gradient(135deg,#F7B26A,#F38100);background-size:cover;background-position:center;display:flex;align-items:flex-end;}
+  .hero.ph{height:auto;aspect-ratio:21/9;max-height:400px;}   /* 사진 있을 때: PC는 넓게, 모바일은 아래에서 16:10 */
+  @media(max-width:560px){ .hero.ph{aspect-ratio:16/10;} }
   .hero .cap{position:relative;width:100%;padding:18px;background:linear-gradient(transparent,rgba(50,30,8,.62));}
   .b{display:inline-block;font-size:clamp(13.8px,calc(12.82px + 0.252vw),15.6px);font-weight:800;padding:5px 13px;border-radius:20px;}
   .b.cat{background:var(--action);color:#fff;}
@@ -155,6 +157,8 @@
     window.scrollTo(0,0); sendHeight();
   }
 
+  // 사진: 파일명이면 data/programs_img/ 폴더, 인터넷 주소·미리보기(blob)는 그대로
+  function psrc(f){ return /^(https?:|blob:|data:)/.test(f)?f:'data/programs_img/'+encodeURIComponent(f); }
   function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
   function telLink(t){t=esc(t);return t?'<a href="tel:'+t.replace(/[^0-9]/g,'')+'">'+t+'</a>':'-';}
   function days(arr){return (arr&&arr.length)?arr.join('·')+'요일':'';}
@@ -269,7 +273,7 @@
     var pageItems=items.slice((curPage-1)*PAGE, curPage*PAGE);
     el.innerHTML=pageItems.map(function(p){
       var paid=(p.수강료||0)>0;
-      var thumb=p.사진?' style="background-image:url('+esc(p.사진)+')"':'';
+      var thumb=p.사진?' style="background-image:url(\''+esc(psrc(p.사진))+'\')"':'';
       return '<div class="pcard" data-id="'+esc(p.id)+'">'
         + '<div class="pthumb"'+thumb+'>'+(p.사진?'':ICON)+'</div>'
         + '<div class="pinfo"><div class="nm">'+esc(p.이름)+'</div>'
@@ -295,10 +299,10 @@
     if(!p){ location.hash=''; return; }
     var a=DATA.신청안내||{};
     var paid=(p.수강료||0)>0;
-    var hero=p.사진?' style="background-image:url('+esc(p.사진)+')"':'';
+    var hero=p.사진?' style="background-image:url(\''+esc(psrc(p.사진))+'\')"':'';
     var h='';
     h+='<div class="top"><div class="back" id="pBack"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></div><div class="t">프로그램 안내</div></div>';
-    h+='<div class="hero"'+hero+'><div class="cap"><span class="b cat">'+esc(p.구분)+'</span>'
+    h+='<div class="hero'+(p.사진?' ph':'')+'"'+hero+'><div class="cap"><span class="b cat">'+esc(p.구분)+'</span>'
       + (p.분류?'<span class="b sub">'+esc(p.분류)+'</span>':'')
       + '<div class="nm">'+esc(p.이름)+'</div></div></div>';
     h+='<div class="card">'

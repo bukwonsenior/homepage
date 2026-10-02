@@ -309,7 +309,7 @@ PAGES.facility=page({
     return wb;
   },
   tab:[{k:'실',label:'실(방)',req:3,cols:[{c:3,h:'실 이름'},{c:7,h:'사진 (쉼표로 최대 3장)',photos:1},{c:4,h:'장소 역할',ta:1},{c:5,h:'이용방법',ta:1}],hi:'.room-btn',
-    tip:'층 이름: 전경 / 1층 / 2층 … · 사진이 없으면 비워 두세요(화면에 "사진 준비 중") · 📷로 사진을 고르면 미리보기에 바로 보여요'}],
+    tip:'층 이름: 전경 / 1층 / 2층 … · 사진이 없으면 비워 두세요(화면에 "사진 준비 중") · 📷로 사진을 고르면 미리보기에 바로 보여요 · 사진은 가로 4:3(예: 1600×1200), PC 기준으로 고르면 모바일은 자동으로 맞춰져요'}],
   guide:['■ 한 줄 = 실(방) 하나. 층명이 같은 줄끼리 한 층으로 묶이고 나온 순서대로 화면에 나옵니다.','■ 사진: img/facility/ 폴더의 파일명. 여러 장은 쉼표로 (최대 3장).','■ 게시: O=보임 / X=숨김'],
   build:function(rows,url){
     var F=[],m={};
@@ -338,7 +338,7 @@ function pgDate(v){if(!v)return null;var t=String(v).replace(/[.\/]/g,'-').repla
 var PG_TIME=/^([01]\d|2[0-3]):[0-5]\d$/;
 PAGES.programs=page({
   group:'프로그램', name:'프로그램', crumb:'프로그램 › 프로그램 시간표', html:'programs.html', xlsx:'data/북원_홈페이지_프로그램관리.xlsx', sheet:'프로그램',
-  nslots:20, map:PG_COLS, fixedTabs:['평생교육','동아리','특강'], tabWord:'구분', privacy:true,
+  nslots:20, img:'data/programs_img/', imgVar:false, photoTip:'가로 사진 16:9 (예: 1600×900) · 사람·활동 모습을 가운데에', map:PG_COLS, fixedTabs:['평생교육','동아리','특강'], tabWord:'구분', privacy:true,
   top:[
     {k:'신청안내',label:'신청 안내 (수강신청 안내 화면)',fixed:1,cols:[{c:3,h:'항목',ro:1},{c:4,h:'내용',ta:1},{c:5,h:'설명',ro:1}],hi:'#applyBox',hiKey:function(r){return 'g:'+r[3];},
       tip:'항목 이름은 바꿀 수 없어요. 날짜는 2026-08-03 처럼 · 현재상태는 신청기간중 / 신청기간아님 · 이용절차·유의사항은 한 줄에 하나씩(엔터)'},
@@ -347,11 +347,11 @@ PAGES.programs=page({
       tip:'누르면 펼쳐지는 안내예요. 자주 묻는 질문 › 프로그램에도 자동으로 함께 나와요 → 제목은 질문 형태로 써 주세요.'}
   ],
   tab:[{k:'프로그램',label:'프로그램',form:1,req:3,hi:'.hero',hiKey:function(r){return r[1]+'/'+r[3];},
-    tip:'홈페이지에는 요일→시작시간 순으로 자동 정렬돼요 · 내리려면 게시를 X로 · 운영종료 날짜가 지나면 자동으로 숨겨져요',
+    tip:'홈페이지에는 요일→시작시간 순으로 자동 정렬돼요 · 내리려면 게시를 X로 · 운영종료 날짜가 지나면 자동으로 숨겨져요 · 사진(선택): 📷로 고르기, 가로 16:9(예: 1600×900), 사람·활동 모습을 가운데에 — PC 기준으로 고르면 모바일은 자동으로 맞춰져요',
     cols:[{c:3,h:'프로그램명',w:2},{c:5,h:'분류',opts:['','정보화·어학','노래·댄스·악기','운동','서예·공예','미술']},{c:7,h:'강사'},
           {c:8,h:'요일 (월, 수)'},{c:9,h:'시작 (09:30)'},{c:10,h:'종료 (11:00)'},{c:11,h:'장소'},
           {c:12,h:'정원'},{c:13,h:'수강료 (0=무료)'},{c:14,h:'재료비',opts:['없음','별도']},{c:15,h:'운영시작'},{c:16,h:'운영종료'},
-          {c:4,h:'안내문구 (상세화면 주황 박스)',w:2},{c:18,h:'사진 주소(선택)'},{c:17,h:'비고 (홈페이지에 안 나옴)',w:2}]}],
+          {c:4,h:'안내문구 (상세화면 주황 박스)',w:2},{c:18,h:'사진 (선택 · 📷로 고르기)',photos:1},{c:17,h:'비고 (홈페이지에 안 나옴)',w:2}]}],
   readWB:function(wb){
     var out=[];
     function sheet(n){var ws=wb.Sheets[n];if(!ws)throw '\''+n+'\' 시트가 없어요';return XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:true});}
@@ -391,6 +391,7 @@ PAGES.programs=page({
       if(a1&&a2&&a1!=='INVALID'&&a2!=='INVALID'&&a1>a2)warns.push(ln+': '+r[3]+'('+a2+')이 '+sk+'('+a1+')보다 빨라요');}
     if(r[2]==='안내문'&&!r[3]&&r[4])errs.push(ln+': 안내문 제목이 비어 있어요');
     if(r[2]!=='프로그램')return;
+    if(splitPh(r[18]).length>1)warns.push(ln+': 프로그램 사진은 1장만 쓰여요 (첫 장만 보여요)');
     if(P.fixedTabs.indexOf(r[1])<0)errs.push(ln+': 구분은 평생교육/동아리/특강 중 하나여야 해요 (지금: '+esc(r[1])+')');
     var d=pgDays(r[8]);if(!d.length)errs.push(ln+': 요일이 비어 있어요');
     d.forEach(function(x){if(PG_DAYS.indexOf(x)<0)errs.push(ln+': 요일이 이상해요 "'+esc(x)+'" (월·화·수·목·금·토·일)');});
@@ -406,7 +407,7 @@ PAGES.programs=page({
     var dup=rows.filter(function(x){return x!==r&&!isX(x)&&x[2]==='프로그램'&&x[1]===r[1]&&x[3]===r[3];});
     if(dup.length)errs.push(ln+': "'+esc(r[3])+'" 이름이 같은 구분 안에 또 있어요 (1반/2반처럼 다르게)');
   },
-  build:function(rows){
+  build:function(rows,url){
     var g={},notes=[],ps=[];
     rows.forEach(function(r){
       if(r[2]==='신청안내'){var v=r[4];if(/일$|_시작$|_종료$|^선정발표$/.test(r[3])){var d=pgDate(v);if(d&&d!=='INVALID')v=d;}g[r[3]]=v;return;}
@@ -415,7 +416,7 @@ PAGES.programs=page({
       if(r[2]!=='프로그램'||!r[3])return;
       var fee=parseInt(parseFloat(r[13]))||0,cap=r[12]?parseInt(parseFloat(r[12])):null,d1=pgDate(r[15]),d2=pgDate(r[16]);
       ps.push({id:r[1]+'/'+r[3],구분:r[1],분류:r[5]||null,이름:r[3],강사:r[7]||null,요일:pgDays(r[8]),시작시간:r[9],종료시간:r[10],장소:r[11],정원:isNaN(cap)?null:cap,
-        수강료:fee,수강료표시:fee?fee.toLocaleString('ko-KR')+'원':'무료',재료비별도:(r[14]||'없음')==='별도',운영시작:d1==='INVALID'?null:d1,운영종료:d2==='INVALID'?null:d2,안내문구:r[4]||null,사진:r[18]||null});
+        수강료:fee,수강료표시:fee?fee.toLocaleString('ko-KR')+'원':'무료',재료비별도:(r[14]||'없음')==='별도',운영시작:d1==='INVALID'?null:d1,운영종료:d2==='INVALID'?null:d2,안내문구:r[4]||null,사진:(function(){var f=splitPh(r[18])[0];return f?(/^http/.test(f)?f:url(r,f)):null;})()});
     });
     return {학기:g.학기명||'',문의전화:g.문의전화||'033-747-0516',신청안내:g,안내문:notes,프로그램:ps,탭:P.fixedTabs.map(function(c){return {이름:c};})};
   }
@@ -658,7 +659,7 @@ function group(s,area,tab){
         +'<div class="info"><input placeholder="파일명" value="'+esc(f)+'" oninput="upd('+i+','+P.photo.file+',this.value)"><input placeholder="사진 설명(캡션)" value="'+esc(r[P.photo.cap])+'" oninput="upd('+i+','+P.photo.cap+',this.value)">'
         +'<select onchange="upd('+i+',0,this.value,1)"><option'+(isX(r)?'':' selected')+'>O</option><option'+(isX(r)?' selected':'')+'>X</option></select></div></div>';
     });
-    return h+'</div><div class="addrow"><label>📷 사진 추가<input type="file" accept="image/*" multiple onchange="addPhotos(this.files);this.value=\'\'"></label><span class="one">가로 4:3, 2MB 이하 jpg 권장 · 사진 파일은 GitHub <b>'+P.img+'</b>에 같은 이름으로 올려야 해요</span></div></div>';
+    return h+'</div><div class="addrow"><label>📷 사진 추가<input type="file" accept="image/*" multiple onchange="addPhotos(this.files);this.value=\'\'"></label><span class="one">'+(P.photoTip||'가로 사진 4:3 (예: 1600×1200)')+' · PC 화면 기준으로 고르면 모바일은 자동으로 맞춰져요 · 큰 사진은 올릴 때 자동으로 줄여요</span></div></div>';
   }
   h+='<table><thead><tr><th class="c-h"></th><th class="c-g">'+(s.fixed||s.noPub?'':'게시')+'</th>';
   if(s.form)h+='<th>'+s.label+' 정보</th>';else s.cols.forEach(function(col){h+=col.icon?'<th class="c-ic">아이콘</th>':'<th>'+col.h+'</th>';});
@@ -678,15 +679,17 @@ function rowHTML(s,i){
   if(s.form){h+='<td><div class="fgrid">'+s.cols.map(function(col){return '<label class="fl'+(col.w?' w2':'')+'"><span>'+col.h+'</span>'+fieldHTML(i,r,col)+'</label>';}).join('')+'</div></td>';}
   else s.cols.forEach(function(col){
     if(col.icon)h+='<td><button class="icbtn" onclick="openIcon('+i+',event)">'+(r[6]&&ICONS[r[6]]?svg(r[6]):'<span class="none">'+(s.k==='정보'?'자동':'선택')+'</span>')+'</button></td>';
-    else if(col.photos){var fs=splitPh(r[col.c]);h+='<td><input value="'+esc(r[col.c])+'" oninput="upd('+i+','+col.c+',this.value)" onchange="buildEditor()"><div class="thumbs">'+fs.map(function(f){return '<img src="'+esc(photoURL(r,f))+'" data-f="'+esc(f)+'" onerror="imgFail(this)">';}).join('')+'<label class="tadd" title="사진 추가">📷<input type="file" accept="image/*" multiple onchange="addPh('+i+','+col.c+',this.files);this.value=\'\'"></label></div></td>';}
+    else if(col.photos)h+='<td>'+photosHTML(i,r,col)+'</td>';
     else if(col.ta)h+='<td><textarea oninput="upd('+i+','+col.c+',this.value)">'+esc(r[col.c])+'</textarea></td>';
     else if(col.ro)h+='<td class="ro">'+esc(r[col.c])+'</td>';
     else h+='<td>'+fieldHTML(i,r,col)+'</td>';
   });
   return h+'<td>'+(s.fixed?'':'<button class="del" title="이 줄 삭제" onclick="delRow('+i+')">×</button>')+'</td></tr>';
 }
+function photosHTML(i,r,col){var fs=splitPh(r[col.c]);return '<input value="'+esc(r[col.c])+'" oninput="upd('+i+','+col.c+',this.value)" onchange="buildEditor()"><div class="thumbs">'+fs.map(function(f){return '<img src="'+esc(photoURL(r,f))+'" data-f="'+esc(f)+'" onerror="imgFail(this)">';}).join('')+'<label class="tadd" title="사진 추가">📷<input type="file" accept="image/*" multiple onchange="addPh('+i+','+col.c+',this.files);this.value=\'\'"></label></div>';}
 function fieldHTML(i,r,col){
   var v=r[col.c]==null?'':r[col.c];
+  if(col.photos)return photosHTML(i,r,col);
   if(col.opts){var o=(typeof col.opts==='function'?col.opts():col.opts).slice();if(o.indexOf(v)<0)o.push(v);return '<select onchange="upd('+i+','+col.c+',this.value)">'+o.map(function(x){return '<option'+(x===v?' selected':'')+'>'+esc(x)+'</option>';}).join('')+'</select>';}
   if(col.ta)return '<textarea oninput="upd('+i+','+col.c+',this.value)">'+esc(v)+'</textarea>';
   return '<input value="'+esc(v)+'" oninput="upd('+i+','+col.c+',this.value)">';
@@ -921,8 +924,8 @@ document.getElementById('ghset').addEventListener('click',function(){
   }).catch(function(e){ghSetToken('');ghStatus();alert(ghErr(e));});
 });
 function b64(bytes){var s='',CH=0x8000;for(var i=0;i<bytes.length;i+=CH)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));return btoa(s);}
-function fileBytes(f){  // 1MB 넘는 jpg는 가로·세로 1600px 이하로 줄여서 올림
-  var big=f.size>1024*1024&&/jpe?g$/i.test(f.name);
+function fileBytes(f){  // 500KB 넘는 jpg는 가로·세로 1600px 이하로 줄여서 올림
+  var big=f.size>500*1024&&/jpe?g$/i.test(f.name);
   if(!big)return f.arrayBuffer().then(function(b){return new Uint8Array(b);});
   return new Promise(function(res){var img=new Image(),u=URL.createObjectURL(f);img.onload=function(){
       var k=Math.min(1,1600/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);
