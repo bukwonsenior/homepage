@@ -187,7 +187,7 @@
       h+='<div class="tabpanel'+(i!==start?' hidden':'')+'" id="tp'+i+'">';
       // 지원사업처럼 왼쪽 메뉴가 없는 페이지: 사업 목록을 맨 위에 크게 (?nav=top 으로도 켤 수 있음)
       if(TOPNAV&&tabs.length>1){
-        h+='<div class="pnav"><div class="pl">'+esc(d.대분류)+' 목록 <small>사업을 누르면 내용이 바뀝니다</small></div><div class="seg pgrid">'
+        h+='<div class="pnav"><div class="pl">'+esc(d.대분류)+' 목록 </div><div class="seg pgrid">'
           +tabs.map(function(x,j){return '<button data-v="'+j+'"'+(j===i?' class="on"':'')+'><span class="no">'+(j+1)+'</span><span class="tx">'+esc(x.제목)+'</span></button>';}).join('')+'</div></div>';
       }
       // 상단
