@@ -42,7 +42,7 @@
   .sec::before{content:"";width:6px;height:21px;border-radius:3px;background:var(--accent);}
 
   .info{display:grid;grid-template-columns:1fr;gap:11px;}
-  @media(min-width:760px){.info{grid-template-columns:repeat(2,1fr);}}
+  @media(min-width:760px){.info{grid-template-columns:repeat(2,1fr);} .info .icard:last-child:nth-child(odd){grid-column:1/-1;}}   /* 카드가 홀수면 마지막 카드는 한 줄 전체 */
   .icard{display:flex;align-items:center;gap:14px;background:var(--white);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:16px 17px;}
   .ic{flex:none;width:50px;height:50px;border-radius:14px;background:var(--soft);display:flex;align-items:center;justify-content:center;}
   .ic svg{width:26px;height:26px;stroke:var(--brand);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
