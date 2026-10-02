@@ -20,11 +20,22 @@
   .bc b{color:var(--brand);}
   .head h1{font-size:clamp(29.7px,calc(27.61px + 0.543vw),33.6px);font-weight:800;letter-spacing:-.8px;}
   .head .sub{display:inline-block;margin-top:8px;font-size:clamp(14.8px,calc(13.8px + 0.272vw),16.8px);font-weight:800;color:var(--accent);background:var(--accent-soft);padding:5px 12px;border-radius:20px;}
-  .head p{font-size:clamp(17px,calc(15.78px + 0.31vw),19.2px);color:#5c554e;line-height:1.6;margin-top:11px;word-break:keep-all;max-width:1000px;}
+  .head p{font-size:clamp(17px,calc(15.78px + 0.31vw),19.2px);color:#5c554e;line-height:1.6;margin-top:11px;word-break:keep-all;}
 
   .seg{display:flex;gap:8px;margin:18px 0 20px;flex-wrap:wrap;}
   .seg button{flex:1 1 auto;min-width:90px;overflow-wrap:anywhere;text-align:center;border:1.5px solid var(--line);background:var(--white);color:var(--gray);font-family:inherit;font-size:clamp(16.4px,calc(15.28px + 0.301vw),18.6px);font-weight:800;padding:12px 6px;border-radius:14px;cursor:pointer;word-break:keep-all;}
   .seg button.on{background:var(--brand);border-color:var(--brand);color:#fff;}
+  /* 사업 목록(지원사업): 맨 위 큰 카드형 */
+  .pnav{background:var(--soft);border:1.5px solid #F6D9B8;border-radius:18px;padding:16px 16px 18px;margin:4px 0 26px;}
+  .pnav .pl{font-size:clamp(17px,calc(15.78px + 0.31vw),19.2px);font-weight:800;color:var(--action);margin:0 2px 12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+  .pnav .pl small{font-size:clamp(14.3px,calc(13.31px + 0.262vw),16.2px);font-weight:600;color:var(--gray);}
+  .pnav .seg.pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0;}
+  .pnav .seg.pgrid button{display:flex;align-items:center;gap:11px;text-align:left;padding:14px 14px;border-radius:14px;background:#fff;color:var(--ink);min-width:0;}
+  .pnav .seg.pgrid button .no{flex:none;width:28px;height:28px;border-radius:50%;background:var(--soft);color:var(--action);font-size:15px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .pnav .seg.pgrid button .tx{flex:1;min-width:0;line-height:1.35;}
+  .pnav .seg.pgrid button.on{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(243,129,0,.24);}
+  .pnav .seg.pgrid button.on .no{background:#fff;color:var(--brand);}
+  @media(max-width:760px){ .pnav{padding:13px 0 14px 12px;} .pnav .seg.pgrid{display:flex;flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:2px 12px 4px 0;-webkit-overflow-scrolling:touch;} .pnav .seg.pgrid button{flex:0 0 auto;max-width:260px;white-space:nowrap;padding:11px 12px;font-size:15px;gap:8px;} .pnav .pl small::after{content:' (옆으로 밀어 보세요)';} }
   @media(max-width:560px){.seg{display:grid;grid-template-columns:1fr 1fr;}.seg button{min-width:0;font-size:15px;padding:10px 4px;}}
 
   .sec{font-size:clamp(21.2px,calc(19.72px + 0.388vw),24px);font-weight:800;margin:24px 2px 13px;display:flex;align-items:center;gap:9px;letter-spacing:-.4px;}
@@ -156,11 +167,17 @@
 
   function render(d){
     var tabs=(d&&d.탭)||[], h='', start=0;
+    var TOPNAV=group==='jiwon'||param('nav')==='top'||(d&&d.대분류==='지원사업');
     if(!tabs.length){document.getElementById('app').innerHTML='<div class="none">페이지를 찾을 수 없습니다.</div>';return;}
     galleries=[];
     var tp=param('tab'); if(tp) tabs.forEach(function(x,i){ if(x.이름표===tp) start=i; });
     tabs.forEach(function(t,i){
       h+='<div class="tabpanel'+(i!==start?' hidden':'')+'" id="tp'+i+'">';
+      // 지원사업처럼 왼쪽 메뉴가 없는 페이지: 사업 목록을 맨 위에 크게 (?nav=top 으로도 켤 수 있음)
+      if(TOPNAV&&tabs.length>1){
+        h+='<div class="pnav"><div class="pl">'+esc(d.대분류)+' 목록 <small>사업을 누르면 내용이 바뀝니다</small></div><div class="seg pgrid">'
+          +tabs.map(function(x,j){return '<button data-v="'+j+'"'+(j===i?' class="on"':'')+'><span class="no">'+(j+1)+'</span><span class="tx">'+esc(x.제목)+'</span></button>';}).join('')+'</div></div>';
+      }
       // 상단
       h+='<div class="head"><div class="bc">사업안내 <b>›</b> '+esc(d.대분류)+' <b>›</b> '+esc(t.제목)+'</div>';
       h+='<h1>'+esc(t.제목)+'</h1>';
@@ -168,7 +185,7 @@
       if(t.설명) h+='<p>'+esc(t.설명)+'</p>';
       h+='</div>';
       // 탭 (2개 이상일 때만)
-      if(tabs.length>1){
+      if(tabs.length>1&&!TOPNAV){
         h+='<div class="seg">'+tabs.map(function(x,j){return '<button data-v="'+j+'"'+(j===i?' class="on"':'')+'>'+esc(x.제목)+'</button>';}).join('')+'</div>';
       }
       // 한눈에 보기
