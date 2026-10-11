@@ -173,9 +173,13 @@
   function render(j){
     j=j||{};var app=document.getElementById('app');
     if(!j.직원&&!j.조직도){document.getElementById('tabs').innerHTML='';app.innerHTML='<div class="none">조직현황을 불러오지 못했습니다.</div>';sendHeight();return;}
-    if(cur==null){cur=0;var tp=param('tab');if(tp)TABS.forEach(function(n,i){if(n.indexOf(tp)===0||String(i)===tp)cur=i;});}
-    document.getElementById('tabs').innerHTML=TABS.map(function(n,i){return '<button class="tab'+(i===cur?' on':'')+'" data-v="'+i+'">'+esc(n)+'</button>';}).join('');
+    // ?view=조직도|직원|운영위원회 → 탭 버튼 없이 그 구역만 (CMS에 iframe 3개를 위아래로 붙일 때)
+    var VIEW=param('view');
+    if(cur==null){cur=0;var tp=VIEW||param('tab');if(tp)TABS.forEach(function(n,i){if(n.indexOf(tp)===0||String(i)===tp)cur=i;});}
+    document.getElementById('tabs').innerHTML=VIEW?'':TABS.map(function(n,i){return '<button class="tab'+(i===cur?' on':'')+'" data-v="'+i+'">'+esc(n)+'</button>';}).join('');
+    document.getElementById('tabs').style.display=VIEW?'none':'';
     var P=[chartHTML(j.조직도,j.인원,j.계),staffHTML(j.직원),commHTML(j.위원)];
+    if(VIEW){var HD=['조직도 및 직원현황','직원 및 주요업무','복지관 운영위원회'];P=P.map(function(h,i){return '<div class="h2">'+HD[i]+'</div>'+h;});}
     app.innerHTML=P.map(function(h,i){return '<div class="tabpanel'+(i===cur?'':' hidden')+'" id="tp'+i+'">'+h+'</div>';}).join('');
     sendHeight();
   }
