@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>조직현황 · 북원노인종합복지관</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-dynamic-subset.min.css">
+<style>
+  :root{--brand:#F38100;--deep:#E2541B;--action:#8A4200;--ink:#2B2320;--gray:#6B655F;--line:#EAE2D6;--wire:#CFC6BA;--soft:#FDF0E2;--panel:#F4F1EC;--dark:#4A4440;--white:#fff;--shadow:0 6px 20px rgba(120,90,50,.08);}
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{background:#fff;}
+  body{font-family:'Pretendard','Apple SD Gothic Neo','맑은 고딕',sans-serif;color:var(--ink);-webkit-font-smoothing:antialiased;}
+  .wrap{max-width:1400px;margin:0;padding:6px 16px 30px;}
+  .hidden{display:none!important;}
+  .none{color:var(--gray);font-size:17px;padding:30px 0;}
+
+  /* 탭 */
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 24px;}
+  .tab{border:1.5px solid var(--line);background:var(--white);color:var(--gray);font-size:clamp(17px,calc(15.78px + 0.31vw),19.2px);font-weight:800;padding:11px 18px;border-radius:13px;cursor:pointer;font-family:inherit;box-shadow:var(--shadow);}
+  .tab.on{background:var(--brand);border-color:var(--brand);color:#fff;box-shadow:0 6px 18px rgba(243,129,0,.24);}
+
+  .h2{display:flex;align-items:center;gap:10px;font-size:clamp(19px,calc(17.4px + 0.42vw),22px);font-weight:800;margin:34px 0 14px;letter-spacing:-.3px;}
+  .h2::before{content:"";width:5px;height:20px;border-radius:3px;background:var(--brand);}
+  .tabpanel>.h2:first-child{margin-top:4px;}
+
+  /* ===== 조직도 ===== */
+  .oc{max-width:1120px;margin:0 auto;}
+  .box{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border-radius:10px;font-weight:800;letter-spacing:-.2px;position:relative;z-index:1;}
+  .b-top{background:var(--deep);color:#fff;min-width:200px;padding:10px 26px;font-size:20px;box-shadow:0 6px 16px rgba(226,84,27,.25);}
+  .b-top small{font-size:13px;font-weight:700;opacity:.92;margin-bottom:2px;}
+  .b-mgr{background:var(--brand);color:#fff;width:180px;padding:10px 0;font-size:18px;box-shadow:0 4px 12px rgba(243,129,0,.22);}
+  .b-com{background:#fff;color:var(--ink);border:1.5px solid #F2A869;width:170px;padding:8px 0;font-size:15.5px;font-weight:700;box-shadow:0 2px 8px rgba(120,90,50,.08);}
+  .oc-top{display:flex;justify-content:center;position:relative;padding-bottom:20px;}
+  .oc-top::after{content:"";position:absolute;left:50%;bottom:0;height:20px;border-left:2px solid var(--wire);}
+  .oc-mid{display:grid;grid-template-columns:1fr 220px 1fr;align-items:center;}
+  .oc-mid .ctr{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px;padding:0 0 22px;align-self:stretch;justify-content:center;}
+  .oc-mid .ctr::before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px solid var(--wire);}
+  .oc-mid .ctr::after{content:"";position:absolute;left:0;right:0;top:calc(50% - 11px);border-top:2px solid var(--wire);}
+  .oc-mid .ctr.noL::after{left:50%;} .oc-mid .ctr.noR::after{right:50%;} .oc-mid .ctr.noL.noR::after{display:none;}
+  .side{position:relative;display:flex;flex-direction:column;gap:10px;padding-bottom:22px;}
+  .side.l{align-items:flex-end;padding-right:24px;} .side.r{align-items:flex-start;padding-left:24px;}
+  .side .b-com::after{content:"";position:absolute;top:50%;width:12px;border-top:2px solid var(--wire);}
+  .side.l .b-com::after{left:100%;} .side.r .b-com::after{right:100%;}
+  .side::before{content:"";position:absolute;top:18px;bottom:40px;border-left:2px solid var(--wire);}
+  .side.l::before{right:12px;} .side.r::before{left:12px;}
+  .side::after{content:"";position:absolute;top:calc(50% - 11px);width:12px;border-top:2px solid var(--wire);}
+  .side.l::after{right:0;} .side.r::after{left:0;}
+  .side.one::before{display:none;}
+  .oc-teams{display:grid;grid-template-columns:repeat(var(--n,5),minmax(0,1fr));gap:16px;position:relative;padding-top:24px;}
+  .oc-teams::before{content:"";position:absolute;top:12px;left:calc(100% / var(--n,5) / 2);right:calc(100% / var(--n,5) / 2);border-top:2px solid var(--wire);}
+  .oc-teams::after{content:"";position:absolute;top:0;left:50%;height:12px;border-left:2px solid var(--wire);}
+  .team{position:relative;background:var(--panel);border-radius:10px;padding-bottom:14px;}
+  .team::before{content:"";position:absolute;top:-12px;left:50%;height:12px;border-left:2px solid var(--wire);}
+  .team .th{background:var(--dark);color:#fff;font-weight:800;font-size:16.5px;text-align:center;padding:9px 6px;border-radius:10px 10px 0 0;letter-spacing:-.2px;}
+  .team ul{list-style:none;padding:10px 10px 0;display:flex;flex-direction:column;gap:5px;align-items:center;text-align:center;}
+  .team li{font-size:15px;font-weight:600;color:#3c342d;line-height:1.45;word-break:keep-all;}
+  .team li.st{margin-top:6px;background:#5E5751;color:#fff;font-size:13.5px;font-weight:700;padding:3px 10px;border-radius:6px;}
+
+  /* 인원표 */
+  .cnt{width:100%;border-collapse:collapse;table-layout:fixed;font-size:16px;text-align:center;}
+  .cnt th,.cnt td{border:1px solid var(--line);padding:10px 4px;word-break:keep-all;}
+  .cnt th{background:var(--panel);font-weight:700;color:#4a423b;font-size:15px;}
+  .cnt td{font-weight:700;font-size:17px;}
+  .cnt .sum{background:var(--soft);color:var(--action);}
+
+  /* 표 공통 (직원·위원회) */
+  .tbl{width:100%;border-collapse:collapse;font-size:clamp(15.5px,calc(14.6px + 0.24vw),17px);}
+  .tbl th{background:var(--panel);font-weight:700;color:#4a423b;padding:12px 10px;border-top:2px solid var(--ink);border-bottom:1px solid var(--line);}
+  .tbl td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:middle;line-height:1.5;word-break:keep-all;}
+  .tbl td.c{text-align:center;}
+  .tbl td.g{text-align:center;font-weight:800;background:#FCFAF7;border-right:1px solid var(--line);}
+  .tbl td.b{text-align:center;font-weight:700;color:var(--action);border-left:1px solid var(--line);}
+  .nm{font-weight:700;letter-spacing:.3em;margin-right:-.3em;white-space:nowrap;}
+  .tbl .rl{white-space:nowrap;}
+  .mlist{display:none;}
+
+  @media (max-width:760px){
+    .tabs{gap:6px;margin-bottom:18px;} .tab{padding:9px 13px;font-size:16px;border-radius:11px;}
+    .h2{margin:26px 0 12px;font-size:19px;}
+    /* 조직도: 연결선 없이 세로로 */
+    .oc-top{padding-bottom:12px;} .oc-top::after{display:none;}
+    .b-top{min-width:0;width:100%;font-size:19px;}
+    .oc-mid{grid-template-columns:1fr 1fr;gap:8px;}
+    .oc-mid .ctr{grid-column:1/-1;order:-1;flex-direction:row;gap:8px;padding:0 0 6px;}
+    .oc-mid .ctr::before,.oc-mid .ctr::after,.side::before,.side::after,.side .b-com::after{display:none;}
+    .b-mgr{width:auto;flex:1;font-size:17px;}
+    .side{padding:0!important;align-items:stretch!important;gap:6px;}
+    .b-com{width:auto;font-size:14.5px;padding:8px 4px;}
+    .oc-teams{grid-template-columns:1fr 1fr;gap:10px;padding-top:14px;}
+    .oc-teams::before,.oc-teams::after,.team::before{display:none;}
+    .team:last-child:nth-child(odd){grid-column:1/-1;}
+    .team .th{font-size:15.5px;padding:8px 4px;}
+    .team ul{padding:8px 6px 0;gap:3px;} .team li{font-size:14px;} .team li.st{font-size:12.5px;padding:2px 8px;}
+    .cnt{display:none;}
+    .cgrid{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;}
+    .cgrid div{background:var(--panel);border-radius:10px;padding:8px 4px;text-align:center;}
+    .cgrid div span{display:block;font-size:12.5px;color:var(--gray);font-weight:600;word-break:keep-all;line-height:1.3;}
+    .cgrid div b{display:block;font-size:18px;font-weight:800;margin-top:2px;}
+    .cgrid div.sum{background:var(--soft);} .cgrid div.sum b{color:var(--action);}
+    /* 표 → 세로 목록 */
+    .tbl{display:none;} .mlist{display:block;}
+    .mg{margin-bottom:12px;}
+    .mg .gt{font-size:15.5px;font-weight:800;color:var(--action);padding:0 2px 6px;border-bottom:2px solid var(--ink);}
+    .mp{display:grid;grid-template-columns:58px 1fr;gap:8px;align-items:baseline;padding:7px 2px;border-bottom:1px solid var(--line);}
+    .mp>b{font-size:16px;font-weight:800;}
+    .mp .d{font-size:14.5px;color:#4a423b;line-height:1.42;word-break:keep-all;}
+    .mp .d i{font-style:normal;font-size:12.5px;font-weight:700;color:var(--action);background:var(--soft);padding:1px 7px;border-radius:20px;margin-right:6px;white-space:nowrap;}
+  }
+  .cgrid{display:none;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="tabs seg" id="tabs"></div>
+  <div id="app"></div>
+</div>
+<script>
+(function(){
+  // 편집기 규약: 탭마다 .tabpanel#tp{i}, 탭 버튼 = .seg button[data-v], 불러오기 = BW_LOAD 마커, 강조 = window.__bwHi
+  var cur=null, TABS=['조직도','직원 및 주요업무','운영위원회'];
+  function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+  function param(k){var m=new RegExp('[?&]'+k+'=([^&]+)').exec(location.search);return m?decodeURIComponent(m[1]):null;}
+  function K(k){return ' data-k="'+esc(k)+'"';}
+  function nm(n){return '<span class="nm">'+esc(n)+'</span>';}
+
+  function chartHTML(c,cnt,total){
+    c=c||{};var h='<div class="oc">';
+    if(c.상단)h+='<div class="oc-top"><div class="box b-top"'+K('o:'+c.상단.이름)+'>'+(c.상단.윗글씨?'<small>'+esc(c.상단.윗글씨)+'</small>':'')+esc(c.상단.이름)+'</div></div>';
+    var L=c.왼쪽||[],R=c.오른쪽||[],M=c.관리||[];
+    if(L.length||R.length||M.length){
+      h+='<div class="oc-mid"><div class="side l'+(L.length<2?' one':'')+'">'+L.map(function(x){return '<div class="box b-com"'+K('o:'+x)+'>'+esc(x)+'</div>';}).join('')+'</div>'
+        +'<div class="ctr'+(L.length?'':' noL')+(R.length?'':' noR')+'">'+M.map(function(x){return '<div class="box b-mgr"'+K('o:'+x)+'>'+esc(x)+'</div>';}).join('')+'</div>'
+        +'<div class="side r'+(R.length<2?' one':'')+'">'+R.map(function(x){return '<div class="box b-com"'+K('o:'+x)+'>'+esc(x)+'</div>';}).join('')+'</div></div>';
+    }
+    var T=c.팀||[];
+    if(T.length){
+      h+='<div class="oc-teams" style="--n:'+T.length+'">'+T.map(function(t){
+        var li='';(t.항목||[]).forEach(function(it,i){if(it.소제목&&(i===0||t.항목[i-1].소제목!==it.소제목))li+='<li class="st">'+esc(it.소제목)+'</li>';li+='<li'+K('w:'+t.이름+':'+i)+'>'+esc(it.항목)+'</li>';});
+        return '<div class="team"'+K('o:'+t.이름)+'><div class="th">'+esc(t.이름)+'</div><ul>'+li+'</ul></div>';
+      }).join('')+'</div>';
+    }
+    h+='</div>';
+    if(cnt&&cnt.length){
+      h+='<div class="h2">직종별 인원</div><table class="cnt"><tr><th class="sum">계(명)</th>'+cnt.map(function(x){return '<th'+K('c:'+x.구분)+'>'+esc(x.구분)+'</th>';}).join('')+'</tr>'
+        +'<tr><td class="sum">'+total+'</td>'+cnt.map(function(x){return '<td'+K('c:'+x.구분)+'>'+x.수+'</td>';}).join('')+'</tr></table>'
+        +'<div class="cgrid"><div class="sum"><span>계(명)</span><b>'+total+'</b></div>'+cnt.map(function(x){return '<div'+K('c:'+x.구분)+'><span>'+esc(x.구분)+'</span><b>'+x.수+'</b></div>';}).join('')+'</div>';
+    }
+    return h;
+  }
+  function staffHTML(T){
+    if(!T||!T.length)return '<div class="none">등록된 직원이 없습니다.</div>';
+    var t='<table class="tbl"><colgroup><col style="width:15%"><col style="width:11%"><col style="width:14%"><col></colgroup><thead><tr><th>구분</th><th>성명</th><th>직책</th><th>주요업무</th></tr></thead><tbody>';
+    var m='<div class="mlist">';
+    T.forEach(function(g){
+      g.사람.forEach(function(p,i){
+        t+='<tr'+K('p:'+g.이름+'|'+p.이름)+'>'+(i===0?'<td class="g" rowspan="'+g.사람.length+'">'+esc(g.이름)+'</td>':'')+'<td class="c">'+nm(p.이름)+'</td><td class="c rl">'+esc(p.직책)+'</td><td>'+esc(p.업무)+'</td></tr>';
+      });
+      m+='<div class="mg"><div class="gt">'+esc(g.이름)+'</div>'+g.사람.map(function(p){return '<div class="mp"'+K('p:'+g.이름+'|'+p.이름)+'><b>'+esc(p.이름)+'</b><div class="d">'+(p.직책?'<i>'+esc(p.직책)+'</i>':'')+esc(p.업무)+'</div></div>';}).join('')+'</div>';
+    });
+    return t+'</tbody></table>'+m+'</div>';
+  }
+  function commHTML(M){
+    if(!M||!M.length)return '<div class="none">등록된 위원이 없습니다.</div>';
+    var t='<table class="tbl"><colgroup><col style="width:9%"><col style="width:16%"><col><col style="width:18%"></colgroup><thead><tr><th>번호</th><th>성명</th><th>소속</th><th>비고</th></tr></thead><tbody>';
+    M.forEach(function(x,i){
+      var span=0;if(i===0||M[i-1].비고!==x.비고){span=1;while(i+span<M.length&&M[i+span].비고===x.비고)span++;}
+      t+='<tr'+K('m:'+x.이름)+'><td class="c">'+(i+1)+'</td><td class="c">'+nm(x.이름)+'</td><td class="c">'+esc(x.소속)+'</td>'+(span?'<td class="b" rowspan="'+span+'">'+esc(x.비고)+'</td>':'')+'</tr>';
+    });
+    return t+'</tbody></table><div class="mlist"><div class="mg">'+M.map(function(x){return '<div class="mp"'+K('m:'+x.이름)+'><b>'+esc(x.이름)+'</b><div class="d">'+(x.비고?'<i>'+esc(x.비고)+'</i>':'')+esc(x.소속)+'</div></div>';}).join('')+'</div></div>';
+  }
+
+  function render(j){
+    j=j||{};var app=document.getElementById('app');
+    if(!j.직원&&!j.조직도){document.getElementById('tabs').innerHTML='';app.innerHTML='<div class="none">조직현황을 불러오지 못했습니다.</div>';sendHeight();return;}
+    if(cur==null){cur=0;var tp=param('tab');if(tp)TABS.forEach(function(n,i){if(n.indexOf(tp)===0||String(i)===tp)cur=i;});}
+    document.getElementById('tabs').innerHTML=TABS.map(function(n,i){return '<button class="tab'+(i===cur?' on':'')+'" data-v="'+i+'">'+esc(n)+'</button>';}).join('');
+    var P=[chartHTML(j.조직도,j.인원,j.계),staffHTML(j.직원),commHTML(j.위원)];
+    app.innerHTML=P.map(function(h,i){return '<div class="tabpanel'+(i===cur?'':' hidden')+'" id="tp'+i+'">'+h+'</div>';}).join('');
+    sendHeight();
+  }
+  function setTab(i){
+    cur=i;
+    document.querySelectorAll('#tabs .tab').forEach(function(x,j){x.classList.toggle('on',j===i);});
+    document.querySelectorAll('#app .tabpanel').forEach(function(p,j){p.classList.toggle('hidden',j!==i);});
+    sendHeight();
+  }
+  document.getElementById('tabs').addEventListener('click',function(e){var b=e.target.closest('.tab');if(!b)return;setTab(+b.dataset.v);window.scrollTo(0,0);});
+
+  // 편집기 미리보기 강조: o:상자 w:팀:번호 c:인원구분 → 조직도 / p:팀|이름 → 직원 / m:이름 → 운영위원회
+  window.__bwHi=function(m){
+    if(!m||!m.key)return false;
+    var t={o:0,w:0,c:0,p:1,m:2}[m.key.charAt(0)];if(t==null)return false;
+    setTab(t);
+    var els=[].filter.call(document.querySelectorAll('#tp'+t+' [data-k]'),function(e){return e.dataset.k===m.key&&e.offsetParent!==null;});
+    els.forEach(function(e){e.classList.add('bwhi');});
+    if(els[0])els[0].scrollIntoView({block:'center',behavior:'smooth'});
+    return true;
+  };
+
+  /*BW_LOAD*/fetch('data/org.json?t='+Date.now()).then(function(r){return r.json();}).then(render)
+    .catch(function(){document.getElementById('app').innerHTML='<div class="none">조직현황을 불러오지 못했습니다.</div>';});/*BW_LOAD_END*/
+
+  function sendHeight(){try{var h=Math.ceil(document.querySelector('.wrap').getBoundingClientRect().height)+12;parent.postMessage({bwOrg:'height',height:h},'*');}catch(e){}}
+  window.addEventListener('load',sendHeight);window.addEventListener('resize',sendHeight);
+  setTimeout(sendHeight,600);setTimeout(sendHeight,1500);
+})();
+</script>
+</body>
+</html>
