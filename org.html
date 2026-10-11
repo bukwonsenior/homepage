@@ -78,17 +78,23 @@
   @media (max-width:760px){
     .tabs{gap:6px;margin-bottom:18px;} .tab{padding:9px 13px;font-size:16px;border-radius:11px;}
     .h2{margin:26px 0 12px;font-size:19px;}
-    /* 조직도: 연결선 없이 세로로 */
-    .oc-top{padding-bottom:12px;} .oc-top::after{display:none;}
-    .b-top{min-width:0;width:100%;font-size:19px;}
-    .oc-mid{grid-template-columns:1fr 1fr;gap:8px;}
-    .oc-mid .ctr{grid-column:1/-1;order:-1;flex-direction:row;gap:8px;padding:0 0 6px;}
-    .oc-mid .ctr::before,.oc-mid .ctr::after,.side::before,.side::after,.side .b-com::after{display:none;}
-    .b-mgr{width:auto;flex:1;font-size:17px;}
-    .side{padding:0!important;align-items:stretch!important;gap:6px;}
+    /* 조직도(모바일): 기존 홈페이지처럼 세로 줄기 — 이사장 → 위원회(좌우) → 관장·과장 → 팀 2열 */
+    .oc-top{padding-bottom:18px;} .oc-top::after{height:18px;}
+    .b-top{min-width:0;width:62%;font-size:19px;padding:9px 10px;}
+    .b-top small{font-size:12.5px;}
+    .oc-mid{position:relative;grid-template-columns:1fr 26px 1fr;}
+    .oc-mid::before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px solid var(--wire);}
+    .side.l{grid-column:1;grid-row:1;} .side.r{grid-column:3;grid-row:1;}
+    .side{padding:0!important;align-items:stretch!important;gap:8px;}
+    .side::before,.side .b-com::after{display:none;}
+    .side::after{top:50%;width:13px;} .side.l::after{right:-13px;} .side.r::after{left:-13px;}
     .b-com{width:auto;font-size:14.5px;padding:8px 4px;}
-    .oc-teams{grid-template-columns:1fr 1fr;gap:10px;padding-top:14px;}
-    .oc-teams::before,.oc-teams::after,.team::before{display:none;}
+    .oc-mid .ctr{grid-column:1/-1;grid-row:2;flex-direction:column;gap:10px;padding:18px 0 0;}
+    .oc-mid .ctr::before,.oc-mid .ctr::after{display:none;}
+    .b-mgr{width:62%;font-size:17px;padding:9px 0;}
+    .oc-teams{grid-template-columns:1fr 1fr;gap:10px;padding-top:28px;}
+    .oc-teams::before{left:25%;right:25%;top:14px;} .oc-teams::after{height:14px;}
+    .team::before{top:-14px;height:14px;} .team:nth-child(n+3)::before{display:none;}
     .team:last-child:nth-child(odd){grid-column:1/-1;}
     .team .th{font-size:15.5px;padding:8px 4px;}
     .team ul{padding:8px 6px 0;gap:3px;} .team li{font-size:14px;} .team li.st{font-size:12.5px;padding:2px 8px;}
