@@ -33,19 +33,18 @@
   .b-com{background:#fff;color:var(--ink);border:1.5px solid #F2A869;width:170px;padding:8px 0;font-size:15.5px;font-weight:700;box-shadow:0 2px 8px rgba(120,90,50,.08);}
   .oc-top{display:flex;justify-content:center;position:relative;padding-bottom:20px;}
   .oc-top::after{content:"";position:absolute;left:50%;bottom:0;height:20px;border-left:2px solid var(--wire);}
-  .oc-mid{display:grid;grid-template-columns:1fr 220px 1fr;align-items:center;}
-  .oc-mid .ctr{position:relative;display:flex;flex-direction:column;align-items:center;gap:22px;padding:0 0 22px;align-self:stretch;justify-content:center;}
-  .oc-mid .ctr::before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px solid var(--wire);}
-  .oc-mid .ctr::after{content:"";position:absolute;left:0;right:0;top:calc(50% - 11px);border-top:2px solid var(--wire);}
-  .oc-mid .ctr.noL::after{left:50%;} .oc-mid .ctr.noR::after{right:50%;} .oc-mid .ctr.noL.noR::after{display:none;}
-  .side{position:relative;display:flex;flex-direction:column;gap:10px;padding-bottom:22px;}
-  .side.l{align-items:flex-end;padding-right:24px;} .side.r{align-items:flex-start;padding-left:24px;}
+  /* 위원회(좌우)는 이사장 바로 아래, 관장·과장은 그 아래 가운데 */
+  .oc-mid{position:relative;display:grid;grid-template-columns:1fr 260px 1fr;align-items:center;}
+  .oc-mid::before{content:"";position:absolute;left:50%;top:0;bottom:0;border-left:2px solid var(--wire);}
+  .oc-mid .ctr{grid-column:2;grid-row:2;position:relative;display:flex;flex-direction:column;align-items:center;gap:20px;padding:26px 0 24px;}
+  .side{position:relative;display:flex;flex-direction:column;gap:10px;grid-row:1;}
+  .side.l{grid-column:1;align-items:flex-end;padding-right:24px;} .side.r{grid-column:3;align-items:flex-start;padding-left:24px;}
   .side .b-com::after{content:"";position:absolute;top:50%;width:12px;border-top:2px solid var(--wire);}
   .side.l .b-com::after{left:100%;} .side.r .b-com::after{right:100%;}
-  .side::before{content:"";position:absolute;top:18px;bottom:40px;border-left:2px solid var(--wire);}
+  .side::before{content:"";position:absolute;top:18px;bottom:18px;border-left:2px solid var(--wire);}
   .side.l::before{right:12px;} .side.r::before{left:12px;}
-  .side::after{content:"";position:absolute;top:calc(50% - 11px);width:12px;border-top:2px solid var(--wire);}
-  .side.l::after{right:0;} .side.r::after{left:0;}
+  .side::after{content:"";position:absolute;top:50%;width:142px;border-top:2px solid var(--wire);}
+  .side.l::after{right:-130px;} .side.r::after{left:-130px;}
   .side.one::before{display:none;}
   .oc-teams{display:grid;grid-template-columns:repeat(var(--n,5),minmax(0,1fr));gap:16px;position:relative;padding-top:24px;}
   .oc-teams::before{content:"";position:absolute;top:12px;left:calc(100% / var(--n,5) / 2);right:calc(100% / var(--n,5) / 2);border-top:2px solid var(--wire);}
@@ -90,7 +89,6 @@
     .side::after{top:50%;width:13px;} .side.l::after{right:-13px;} .side.r::after{left:-13px;}
     .b-com{width:auto;font-size:14.5px;padding:8px 4px;}
     .oc-mid .ctr{grid-column:1/-1;grid-row:2;flex-direction:column;gap:10px;padding:18px 0 0;}
-    .oc-mid .ctr::before,.oc-mid .ctr::after{display:none;}
     .b-mgr{width:62%;font-size:17px;padding:9px 0;}
     .oc-teams{grid-template-columns:1fr 1fr;gap:10px;padding-top:28px;}
     .oc-teams::before{left:25%;right:25%;top:14px;} .oc-teams::after{height:14px;}
