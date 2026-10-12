@@ -283,7 +283,9 @@
     },
     {
      "name": "우리갤러리",
-     "photos": [],
+     "photos": [
+      "img/facility/KakaoTalk_20261012_171228491.jpg"
+     ],
      "role": "어르신 작품 전시 및 문화 향유 공간",
      "usage": "자유 관람"
     },
