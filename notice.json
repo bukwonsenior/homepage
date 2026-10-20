@@ -1,8 +1,14 @@
 {
- "생성시각": "2026-10-20T09:24:47+09:00",
+ "생성시각": "2026-10-21T08:56:48+09:00",
  "출처": "https://www.bwsenior.or.kr/main/sub.html?pageCode=40",
  "전체보기": "https://www.bwsenior.or.kr/main/sub.html?pageCode=40",
  "items": [
+  {
+   "구분": "복지관",
+   "제목": "[가을愛 물든 우리 마을 한마당] 행사 안내",
+   "날짜": "2026-10-20",
+   "url": "https://www.bwsenior.or.kr/main/sub.html?Mode=view&boardID=www40&num=1644&page=&keyfield=&key=&bCate="
+  },
   {
    "구분": "복지관",
    "제목": "[고충처리] 북원노인종합복지관 9월 이용자고충처리 결과 공고",
@@ -56,12 +62,6 @@
    "제목": "8/17(월) 광복절 대체휴일 휴관 안내",
    "날짜": "2026-08-06",
    "url": "https://www.bwsenior.or.kr/main/sub.html?Mode=view&boardID=www40&num=1566&page=&keyfield=&key=&bCate="
-  },
-  {
-   "구분": "복지관",
-   "제목": "[노년사회화교육] 하반기 수강생 추가모집(신청)",
-   "날짜": "2026-08-06",
-   "url": "https://www.bwsenior.or.kr/main/sub.html?Mode=view&boardID=www40&num=1565&page=&keyfield=&key=&bCate="
   }
  ]
 }
